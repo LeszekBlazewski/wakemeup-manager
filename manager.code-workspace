@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "packages/front"
+		},
+		{
+			"path": "packages/api"
+		}
+	],
+	"settings": {}
+}

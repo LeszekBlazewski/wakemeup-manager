@@ -1,0 +1,29 @@
+#cloud-config
+autoinstall:
+  version: 1
+  updates: security
+  interactive-sections:
+    - storage
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: http://pl.archive.ubuntu.com/ubuntu
+      - arches: [default]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+  identity:
+    {
+      hostname: lab229,
+      username: lab,
+      password: $6$PE6dgj7Hu2ACsER5$ySbCNU5a4u1mzHgzZaQmdbpmYsCpaYKX1HJtBnvNeRvUfXOUfG06vVcbGglh.x2liR9t277RMQcv4zgdVVEYN0,
+    }
+  keyboard: { layout: pl, toggle: null, variant: "" }
+  locale: en_US.UTF-8
+  ssh:
+    allow-pw: false
+    authorized-keys:
+      [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBKXY4qg4iXrMI24kP5VB6v66rkCm8rhICDYHzMOU96S lab229@iiar.pwr.edu.pl",
+      ]
+    install-server: true

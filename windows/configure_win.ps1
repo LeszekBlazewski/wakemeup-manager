@@ -38,6 +38,8 @@ $sshd_config_file = "C:\ProgramData\ssh\sshd_config"
 (Get-Content -path $sshd_config_file -Raw) -replace '#PubkeyAuthentication yes', 'PubkeyAuthentication yes'    | Set-Content -Path $sshd_config_file
 (Get-Content -path $sshd_config_file -Raw) -replace '#PasswordAuthentication yes', 'PasswordAuthentication no' | Set-Content -Path $sshd_config_file
 Write-Output "SSH password authentication disabled and key auth enabled successfully."
+# Change default shell to powershell instead of cmd
+New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -Force
 
 # ICMP firewall rule
 if (!(Get-NetFirewallRule -Name "ICMP Allow incoming V4 echo request" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {

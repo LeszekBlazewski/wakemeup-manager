@@ -14,7 +14,7 @@
         fab
         small
         color="primary"
-        class="mr-2"
+        class="ml-2"
         title="Boot Windows on selected"
       >
         <v-icon> mdi-microsoft-windows </v-icon>
@@ -24,10 +24,20 @@
         fab
         small
         color="primary"
-        class="mr-1"
+        class="ml-2"
         title="Boot Ubuntu on selected"
       >
         <v-icon> mdi-ubuntu </v-icon>
+      </v-btn>
+      <v-btn
+        :disabled="!selectedStates.length"
+        title="Shutdown selected"
+        fab
+        small
+        color="primary"
+        class="ml-2"
+      >
+        <v-icon> mdi-window-close </v-icon>
       </v-btn>
     </v-card-title>
     <v-card-text>
@@ -47,6 +57,7 @@
       </v-list>
     </v-card-text>
   </v-card>
+  <!-- TODO: vuetify-confirm on {boot, shutdown} -->
 </template>
 
 <script lang="ts">

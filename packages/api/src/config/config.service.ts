@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
+import { resolve } from 'path';
 
 @Injectable()
 export class ConfigService implements JwtOptionsFactory {
@@ -9,6 +10,16 @@ export class ConfigService implements JwtOptionsFactory {
       password: process.env.AUTH_PASSWORD || 'password',
       name: 'Lab 229 Cluster Manager',
     };
+  }
+
+  /**
+   * @returns absolute path to inventory yaml
+   */
+  public getInventoryPath() {
+    return (
+      process.env.ANSIBLE_INVENTORY ||
+      resolve(__dirname, '../../test/data/inventory.yml')
+    );
   }
 
   public isProd() {

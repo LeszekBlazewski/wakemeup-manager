@@ -3,8 +3,7 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - manager-front',
-    title: 'manager-front',
+    titleTemplate: '%s - 229 Cluster Manager',
     htmlAttrs: {
       lang: 'en'
     },
@@ -44,7 +43,7 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
     'nuxt-socket-io',
-
+    ['@pinia/nuxt', { disableVuex: false }],
   ],
 
   axios: {

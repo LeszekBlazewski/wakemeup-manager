@@ -4,6 +4,7 @@ import {
   Body,
   UseGuards,
   NotFoundException,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -12,6 +13,7 @@ import { JwtRefreshAuthGuard } from './jwt-refresh-auth.guard';
 import { User } from './models/User.model';
 import { Token } from './decorators/token.decorator';
 import { AuthUser } from './decorators/auth-user.decorator';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -36,5 +38,12 @@ export class AuthController {
   @ApiBearerAuth()
   async refresh(@Token() token: string, @AuthUser() user: User) {
     return await this.service.refresh(token, user);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async me(@AuthUser() user: User) {
+    return user;
   }
 }

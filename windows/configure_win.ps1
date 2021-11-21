@@ -11,6 +11,7 @@ Invoke-WebRequest -Uri "${config_folder_uri}/${reg_file_name}" -OutFile $reg_fil
 # Import the fil using reg programm
 reg import $reg_file_name
 Write-Output "Registry entries for WoL and startup modified successfully."
+Remove-Item $reg_file_name 
 
 # SSH server setup
 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
@@ -31,6 +32,7 @@ $ssh_key_file_location = "C:\ProgramData\ssh\${ssh_key_file_name}"
 Invoke-WebRequest -Uri "${config_folder_uri}/${ssh_key_file_name}" -OutFile $ssh_key_file_location
 # Appropriately ACL the authorized_keys file on your server
 icacls.exe $ssh_key_file_location /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
+Remove-Item $ssh_key_file_location
 Write-Output "Public key lab229 copied and access for administrators granted successfully for public keys file."
 # Disable password authentication and enable key auth
 $sshd_config_file = "C:\ProgramData\ssh\sshd_config"

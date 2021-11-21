@@ -36,8 +36,8 @@ Remove-Item $ssh_key_file_location
 Write-Output "Public key lab229 copied and access for administrators granted successfully for public keys file."
 # Disable password authentication and enable key auth
 $sshd_config_file = "C:\ProgramData\ssh\sshd_config"
-(Get-Content -path $sshd_config_file -Raw) -replace '^#PubkeyAuthentication yes', '^PubkeyAuthentication yes'    | Set-Content -Path $sshd_config_file
-(Get-Content -path $sshd_config_file -Raw) -replace '^#PasswordAuthentication yes', '^PasswordAuthentication no' | Set-Content -Path $sshd_config_file
+(Get-Content -path $sshd_config_file -Raw) -replace '#PubkeyAuthentication yes', 'PubkeyAuthentication yes'    | Set-Content -Path $sshd_config_file
+(Get-Content -path $sshd_config_file -Raw) -replace '#PasswordAuthentication yes', 'PasswordAuthentication no' | Set-Content -Path $sshd_config_file
 Write-Output "SSH password authentication disabled and key auth enabled successfully."
 
 # ICMP firewall rule

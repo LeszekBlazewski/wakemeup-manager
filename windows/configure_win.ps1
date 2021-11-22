@@ -14,7 +14,7 @@ Write-Output "Registry entries for WoL and startup modified successfully."
 Remove-Item $reg_file_name 
 
 # SSH server setup
-if ((Get-WindowsCapability -Name OpenSSH.Server~~~~0.0.1.0).State -eq "NotPresent") {
+if ((Get-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0).State -eq "NotPresent") {
     Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
 }
 # Start and enable the sshd service

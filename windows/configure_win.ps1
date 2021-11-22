@@ -15,7 +15,9 @@ Remove-Item $reg_file_name
 
 # SSH server setup
 if ((Get-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0).State -eq "NotPresent") {
-    Add-WindowsCapability -ErrorAction SilentlyContinue -Online -Name OpenSSH.Server~~~~0.0.1.0
+    try { Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0 }
+    catch {"Adding openSSH server failed, but if the script continued everything should work properly"}
+    
 }
 # Start and enable the sshd service
 Start-Service sshd

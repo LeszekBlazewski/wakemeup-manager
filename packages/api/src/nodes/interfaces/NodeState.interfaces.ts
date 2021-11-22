@@ -10,5 +10,6 @@ export interface NodeState {
   alive: boolean;
   os: OS;
   name: string;
+  username: string;
   actionPending: boolean;
 }

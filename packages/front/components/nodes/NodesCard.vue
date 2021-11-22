@@ -48,6 +48,7 @@
           :state="state"
           :selected="isSelected(state)"
           @select="select(state)"
+          @shutdown="shutdown(state)"
         />
         <v-list-item v-if="!states.length">
           <v-list-item-content class="justify-center">
@@ -71,6 +72,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { NodeState } from 'api'
 import Vue from 'vue'
+import _ from 'lodash'
 import NodeItem from './NodeItem.vue'
 
 export default defineComponent({
@@ -83,8 +85,9 @@ export default defineComponent({
     const { $auth } = ctx
     // @ts-ignore
     ctx.onUnmounted = onUnmounted
+    let socket: any
     onMounted(() => {
-      const socket: any = ctx.$nuxtSocket({
+      socket = ctx.$nuxtSocket({
         auth: { token: ($auth.strategy as any).token.get() },
       } as any)
       socket.on('node/state', (data: NodeState) => {
@@ -111,7 +114,7 @@ export default defineComponent({
       }),
       allSelected: computed(
         () =>
-          selectedStates.value.length ===
+          selectedStates.value.length !==
           states.value.length - pendingCount.value
       ),
       isSelected(state: NodeState) {
@@ -124,7 +127,7 @@ export default defineComponent({
       },
       selectAll() {
         if (
-          selectedStates.value.length <
+          selectedStates.value.length <=
           states.value.length - pendingCount.value
         )
           selectedStates.value = [...states.value].filter(
@@ -132,6 +135,9 @@ export default defineComponent({
           )
         else selectedStates.value = []
       },
+      shutdown: _.throttle((state: NodeState) => {
+        if (socket) socket.emit('node/shutdown', state)
+      }, 1000),
     }
   },
 })

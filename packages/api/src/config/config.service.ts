@@ -50,4 +50,11 @@ export class ConfigService implements JwtOptionsFactory {
       /** All from createSecretOptions at runtime */
     };
   }
+
+  public getPrivateKeyPath() {
+    return (
+      process.env.SSH_PRIVATE_KEY ||
+      resolve('/home/damian_koper/.ssh/id_ed25519')
+    );
+  }
 }

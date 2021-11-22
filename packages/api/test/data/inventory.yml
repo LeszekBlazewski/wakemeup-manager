@@ -9,18 +9,20 @@ kubernetes:
     worker:
       hosts:
         k8s-1:
-          ansible_host: 255.198.151.8
+          ansible_host: 192.168.0.141
           mac_address: B5-BE-D6-34-57-F0
-          name: Node 01
+          name: Node 01 RPi
+          username: pi
         k8s-2:
-          ansible_host: 224.198.255.161
+          ansible_host: 192.168.0.161
           mac_address: B5-BE-D6-34-57-F0
-          name: Node 02
-        k8s-3:
-          ansible_host: 200.112.169.174
-          mac_address: B5-BE-D6-34-57-F0
-          name: Node 03
-        k8s-4:
-          ansible_host: 254.28.211.173
-          mac_address: B5-BE-D6-34-57-F0
-          name: Node 04
+          name: Node 02 PC
+          username: damian_koper
+        # k8s-3:
+        #   ansible_host: 200.112.169.174
+        #   mac_address: B5-BE-D6-34-57-F0
+        #   name: Node 03
+        # k8s-4:
+        #   ansible_host: 254.28.211.173
+        #   mac_address: B5-BE-D6-34-57-F0
+        #   name: Node 04

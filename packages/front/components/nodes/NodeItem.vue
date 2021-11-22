@@ -68,6 +68,7 @@
           small
           color="primary"
           class="ml-2"
+          @click="$emit('shutdown')"
         >
           <v-icon> mdi-window-close </v-icon>
         </v-btn>
@@ -111,7 +112,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['select'],
+  emits: ['select', 'shutdown'],
   setup() {
     return { OS }
   },

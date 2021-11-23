@@ -34,6 +34,7 @@
     "@nestjs/websockets": "^8.2.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/passport-jwt": "^3.0.6",
+    "@types/wol": "^1.0.1",
     "@types/yaml": "^1.9.7",
     "bcryptjs": "^2.4.3",
     "execa": "^5.0.0",
@@ -43,7 +44,9 @@
     "rxjs": "^7.2.0",
     "ssh2-promise": "^1.0.2",
     "swagger-ui-express": "^4.1.6",
+    "tftp-server": "^1.1.0",
     "wait": "^0.4.2",
+    "wol": "^1.0.7",
     "yaml": "^1.10.2"
   },
   "devDependencies": {

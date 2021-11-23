@@ -9,7 +9,7 @@ import { Socket, Server } from 'socket.io';
 import { ConfigService } from 'src/config/config.service';
 import * as jwt from 'jsonwebtoken';
 import { NodesService } from './nodes.service';
-import { NodeState } from 'src/types';
+import { NodeState, OS } from 'src/types';
 
 @WebSocketGateway({ cors: true })
 export class NodesGateway {
@@ -48,15 +48,44 @@ export class NodesGateway {
 
   @SubscribeMessage('node/shutdown')
   public async handleShutdown(
-    @MessageBody() state: NodeState,
+    @MessageBody() state: NodeState | NodeState[],
     @ConnectedSocket() _client: Socket,
   ): Promise<void> {
-    await this.wrapAction(state, async () => {
-      await this.nodesService.shutdown(state);
+    (state instanceof Array ? state : [state]).forEach(async (state) => {
+      await this.wrapAction(state, async (_state) => {
+        return await this.nodesService.shutdown(_state);
+      });
     });
   }
 
-  private async wrapAction(state: NodeState, action: () => Promise<void>) {
+  @SubscribeMessage(`node/boot/${OS.UBUNTU}`)
+  public async handleBootUbuntu(
+    @MessageBody() state: NodeState | NodeState[],
+    @ConnectedSocket() _client: Socket,
+  ): Promise<void> {
+    (state instanceof Array ? state : [state]).forEach(async (state) => {
+      await this.wrapAction(state, async (_state) => {
+        return await this.nodesService.boot(_state, OS.UBUNTU);
+      });
+    });
+  }
+
+  @SubscribeMessage(`node/boot/${OS.WINDOWS}`)
+  public async handleBootWindows(
+    @MessageBody() state: NodeState | NodeState[],
+    @ConnectedSocket() _client: Socket,
+  ): Promise<void> {
+    (state instanceof Array ? state : [state]).forEach(async (state) => {
+      await this.wrapAction(state, async (_state) => {
+        return await this.nodesService.boot(_state, OS.WINDOWS);
+      });
+    });
+  }
+
+  private async wrapAction(
+    state: NodeState,
+    action: (state: NodeState) => Promise<NodeState>,
+  ) {
     const beforeState = {
       ...this.nodesService.getState(state.host),
       actionPending: true,
@@ -64,10 +93,8 @@ export class NodesGateway {
     this.nodesService.setState(beforeState);
     this.emitStates(beforeState);
 
-    await action();
-
     const afterState = {
-      ...this.nodesService.getState(state.host),
+      ...(await action(beforeState)),
       actionPending: false,
     };
     this.nodesService.setState(afterState);

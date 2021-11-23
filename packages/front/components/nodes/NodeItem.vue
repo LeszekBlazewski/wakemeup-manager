@@ -7,8 +7,7 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </v-overlay>
     <v-tooltip top>
-      <template v-if="state.alive"> Last update: 2005-04-02 21:37:00 </template>
-      <template v-else> Last seen: 2005-04-02 21:37:00 </template>
+      Last update: {{ last }}
       <template #activator="{ attrs, on }">
         <v-list-item-avatar
           v-bind="attrs"
@@ -79,6 +78,7 @@
           small
           color="primary"
           class="ml-2"
+          @click="$emit('boot', OS.WINDOWS)"
         >
           <img style="width: 20px" :src="require('@/assets/windows.png')" />
         </v-btn>
@@ -89,6 +89,7 @@
           small
           color="primary"
           class="ml-2"
+          @click="$emit('boot', OS.UBUNTU)"
         >
           <v-icon> mdi-ubuntu </v-icon>
         </v-btn>
@@ -98,9 +99,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from '@nuxtjs/composition-api'
+import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
 import { NodeState, OS } from 'api'
-
+import { DateTime } from 'luxon'
 export default defineComponent({
   props: {
     state: {
@@ -112,9 +113,16 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['select', 'shutdown'],
-  setup() {
-    return { OS }
+  emits: ['select', 'shutdown', 'boot'],
+  setup(props) {
+    return {
+      OS,
+      last: computed(() => {
+        return DateTime.fromMillis(props.state.timestamp).toLocaleString(
+          DateTime.DATETIME_MED_WITH_SECONDS
+        )
+      }),
+    }
   },
 })
 </script>

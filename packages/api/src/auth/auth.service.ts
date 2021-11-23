@@ -13,7 +13,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {
     const salt = bcryptjs.genSaltSync(10);
-    const userData = configService.getUserData();
+    const userData = configService.createUserData();
 
     this.user = new User();
     this.user.id = 1;

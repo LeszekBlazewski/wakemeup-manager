@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
 import { resolve } from 'path';
+import { OS } from 'src/types';
 
 @Injectable()
 export class ConfigService implements JwtOptionsFactory {
-  public getUserData() {
+  public createUserData() {
     return {
       username: process.env.AUTH_USERNAME || 'username',
       password: process.env.AUTH_PASSWORD || 'password',
@@ -15,7 +16,7 @@ export class ConfigService implements JwtOptionsFactory {
   /**
    * @returns absolute path to inventory yaml
    */
-  public getInventoryPath() {
+  public createInventoryPath() {
     return (
       process.env.ANSIBLE_INVENTORY ||
       resolve(__dirname, '../../test/data/inventory.yml')
@@ -51,10 +52,26 @@ export class ConfigService implements JwtOptionsFactory {
     };
   }
 
-  public getPrivateKeyPath() {
+  public createPrivateKeyPath() {
     return (
       process.env.SSH_PRIVATE_KEY ||
       resolve('/home/damian_koper/.ssh/id_ed25519')
     );
+  }
+
+  public createTftpOptions() {
+    return {
+      port: process.env.TFTP_PORT || 6969,
+      address: process.env.TFTP_ADDRESS || undefined,
+      exclusive: true,
+    };
+  }
+
+  /** GRUB boot option index  */
+  public createBootOptions() {
+    return {
+      [OS.UBUNTU]: process.env.GRUB_UBUNTU || 0,
+      [OS.WINDOWS]: process.env.GRUB_WINDOWS || 3,
+    };
   }
 }

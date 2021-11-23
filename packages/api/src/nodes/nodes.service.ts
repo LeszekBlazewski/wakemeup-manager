@@ -1,24 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { ConfigService } from 'src/config/config.service';
 import { NodeState, OS } from './interfaces/NodeState.interfaces';
 import * as yaml from 'yaml';
-import { Inventory } from './interfaces/Inventory.interface';
+import { Inventory, AnsibleHost } from './interfaces/Inventory.interface';
 import execa from 'execa';
 import SSH2Promise from 'ssh2-promise';
 import wait from 'wait';
+import TFTP from 'tftp-server';
+import wol from 'wol';
+
 @Injectable()
 export class NodesService {
-  /** Map<ansible_host, NodeState> */
-  private states = new Map<string, NodeState>();
+  private states = new Map<AnsibleHost, NodeState>();
+  private bootTargets = new Map<AnsibleHost, OS>();
+  private logger = new Logger(NodesService.name);
+  readonly waitPeriods = 60;
 
   constructor(private configService: ConfigService) {
     this.initStates();
+
+    const tftp = TFTP.createServer();
+    tftp.bind(configService.createTftpOptions());
+    tftp.register(this.handleTFTP.bind(this));
   }
 
   private initStates() {
     this.states.clear();
-    const p = this.configService.getInventoryPath();
+    const p = this.configService.createInventoryPath();
     const inventory = readFileSync(p, { encoding: 'utf-8' });
     const parsed = yaml.parse(inventory) as Inventory;
 
@@ -35,12 +44,13 @@ export class NodesService {
           actionPending: false,
         };
         this.setState(state);
+        this.bootTargets.set(state.host, OS.WINDOWS);
       },
     );
   }
 
   public getState(host: string) {
-    if (!this.states.has(host)) throw new Error('Invalid node host.');
+    if (!this.states.has(host)) throw new Error(`Invalid node host ${host}`);
     return this.states.get(host);
   }
 
@@ -71,24 +81,63 @@ export class NodesService {
     const ssh = new SSH2Promise({
       host: state.host,
       username: state.username,
-      identity: this.configService.getPrivateKeyPath(),
+      identity: this.configService.createPrivateKeyPath(),
     } as unknown);
-    await ssh.connect();
     try {
+      await ssh.connect();
       if (state.os === OS.UBUNTU) await ssh.exec('sudo', ['shutdown', 'now']);
       else await ssh.exec('shutdown', ['-s', '-t', '0']);
-    } catch (e) {
-      /** */
-    } finally {
+      this.logger.log(`[Node ${state.host}] Shutdown requested`);
       ssh.close();
-    }
 
-    /** Wait for shutdown */
+      /** Wait for shutdown */
+      let afterState: NodeState;
+      let waitPeriods = this.waitPeriods;
+      do {
+        await wait(1000);
+        afterState = await this.checkState(state);
+        this.setState(afterState);
+        this.logger.log(`[Node ${state.host}] Shutdown check (${waitPeriods})`);
+      } while (waitPeriods-- > 0 && afterState.alive);
+
+      if (waitPeriods >= 0) this.logger.log(`[Node ${state.host}] Shutdown`);
+      else this.logger.log(`[Node ${state.host}] Shutdown timeout`);
+
+      return afterState;
+    } catch (e) {
+      return state;
+    }
+  }
+
+  public async boot(state: NodeState, os: OS) {
+    this.logger.log(`[Node ${state.host}] Boot requested with: ${os}`);
+    this.bootTargets.set(state.host, os);
+    wol.wake(state.mac);
+
+    /** Wait for boot */
     let afterState: NodeState;
+    let waitPeriods = this.waitPeriods;
     do {
       await wait(1000);
       afterState = await this.checkState(state);
       this.setState(afterState);
-    } while (afterState.alive);
+      this.logger.log(`[Node ${state.host}] Boot check (${waitPeriods})`);
+    } while (waitPeriods-- > 0 && !afterState.alive);
+
+    /** After boot set target to WINDOWS */
+    this.bootTargets.set(state.host, OS.WINDOWS);
+    if (waitPeriods >= 0)
+      this.logger.log(`[Node ${state.host}] Booted with: ${afterState.os}`);
+    else this.logger.log(`[Node ${state.host}] Boot timeout`);
+
+    return afterState;
+  }
+
+  private handleTFTP(req, res) {
+    const address = /(\d+\.\d+\.\d+\.\d+)$/gm.exec(req.address)[1];
+    const bootOS = this.bootTargets.get(address) || OS.WINDOWS;
+    const bootTarget = this.configService.createBootOptions()[bootOS];
+    this.logger.log(`[Node ${address}] GRUB boot with: ${bootOS}`);
+    res(Buffer.from(`set GRUB_DEFAULT="${bootTarget}"`), req);
   }
 }

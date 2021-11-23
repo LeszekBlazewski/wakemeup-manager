@@ -8,14 +8,17 @@ export class NodesController {
   constructor(
     private nodesService: NodesService,
     private nodesGateway: NodesGateway,
-  ) {}
+  ) {
+    this.checkStates();
+  }
+
   @Cron('*/10 * * * * *')
   public checkStates() {
     const oldStates = this.nodesService.getStates();
     oldStates.forEach(async (state) => {
+      const newState = await this.nodesService.checkState(state);
       /** Action reports state on success or timeout */
       if (!state.actionPending) {
-        const newState = await this.nodesService.checkState(state);
         this.nodesService.setState(newState);
         this.nodesGateway.emitStates(newState);
       }

@@ -10,32 +10,41 @@
       Nodes
       <v-spacer />
       <v-btn
-        :disabled="!selectedStates.length"
+        :disabled="
+          !selectedStates.length || !selectedStates.some((s) => !s.alive)
+        "
         fab
         small
         color="primary"
         class="ml-2"
         title="Boot Windows on selected"
+        @click="boot(OS.WINDOWS, selectedStates)"
       >
         <v-icon> mdi-microsoft-windows </v-icon>
       </v-btn>
       <v-btn
-        :disabled="!selectedStates.length"
+        :disabled="
+          !selectedStates.length || !selectedStates.some((s) => !s.alive)
+        "
         fab
         small
         color="primary"
         class="ml-2"
         title="Boot Ubuntu on selected"
+        @click="boot(OS.UBUNTU, selectedStates)"
       >
         <v-icon> mdi-ubuntu </v-icon>
       </v-btn>
       <v-btn
-        :disabled="!selectedStates.length"
+        :disabled="
+          !selectedStates.length || !selectedStates.some((s) => s.alive)
+        "
         title="Shutdown selected"
         fab
         small
         color="primary"
-        class="ml-2"
+        class="ml-2 mr-1"
+        @click="shutdown(selectedStates)"
       >
         <v-icon> mdi-window-close </v-icon>
       </v-btn>
@@ -49,6 +58,7 @@
           :selected="isSelected(state)"
           @select="select(state)"
           @shutdown="shutdown(state)"
+          @boot="(os) => boot(os, state)"
         />
         <v-list-item v-if="!states.length">
           <v-list-item-content class="justify-center">
@@ -70,7 +80,7 @@ import {
   ref,
   useContext,
 } from '@nuxtjs/composition-api'
-import { NodeState } from 'api'
+import { NodeState, OS } from 'api'
 import Vue from 'vue'
 import _ from 'lodash'
 import NodeItem from './NodeItem.vue'
@@ -103,6 +113,7 @@ export default defineComponent({
     )
 
     return {
+      OS,
       states,
       awaitingFirstState,
       selectedStates,
@@ -114,7 +125,7 @@ export default defineComponent({
       }),
       allSelected: computed(
         () =>
-          selectedStates.value.length !==
+          selectedStates.value.length ===
           states.value.length - pendingCount.value
       ),
       isSelected(state: NodeState) {
@@ -135,8 +146,15 @@ export default defineComponent({
           )
         else selectedStates.value = []
       },
-      shutdown: _.throttle((state: NodeState) => {
-        if (socket) socket.emit('node/shutdown', state)
+      shutdown: _.throttle((...states: NodeState[]) => {
+        states.forEach((state) => {
+          if (socket) socket.emit('node/shutdown', state)
+        })
+      }, 1000),
+      boot: _.throttle((os: OS, ...states: NodeState[]) => {
+        states.forEach((state) => {
+          if (socket) socket.emit(`node/boot/${os}`, state)
+        })
       }, 1000),
     }
   },

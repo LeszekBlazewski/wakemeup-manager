@@ -1,5 +1,4 @@
 import colors from 'vuetify/es5/util/colors'
-
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -47,13 +46,21 @@ export default {
   ],
 
   axios: {
-    baseURL: 'http://localhost:3000/',
+    baseURL: process.env.BASE_URL || 'http://localhost:3000/',
   },
 
   publicRuntimeConfig: {
     axios: {
       baseURL: process.env.BASE_URL,
     },
+    io: {
+      sockets: [
+        {
+          url: process.env.BASE_URL || 'http://localhost:3000/',
+          default: true,
+        },
+      ],
+    }
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -113,5 +120,9 @@ export default {
         default: true,
       },
     ],
+  },
+
+  server: {
+    port:3002
   }
 }

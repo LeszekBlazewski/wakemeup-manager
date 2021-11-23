@@ -44,6 +44,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async me(@AuthUser() user: User) {
-    return user;
+    return { ...user, password: undefined };
   }
 }

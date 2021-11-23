@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="awaitingFirstState">
+  <v-card :loading="!states.length">
     <v-card-title>
       <v-simple-checkbox
         :indeterminate="indeterminate"
@@ -59,6 +59,7 @@
           @select="select(state)"
           @shutdown="shutdown(state)"
           @boot="(os) => boot(os, state)"
+          @terminal="runInTerminal(state)"
         />
         <v-list-item v-if="!states.length">
           <v-list-item-content class="justify-center">
@@ -75,85 +76,81 @@
 import {
   computed,
   defineComponent,
-  onMounted,
-  onUnmounted,
+  inject,
   ref,
-  useContext,
+  watch,
 } from '@nuxtjs/composition-api'
-import { NodeState, OS } from 'api'
+import { AnsibleHost, NodeState, OS } from 'api'
 import Vue from 'vue'
 import _ from 'lodash'
 import NodeItem from './NodeItem.vue'
-
+import { useNodesStore } from '~/store/nodesStore'
+import { useTerminal } from '@/composables/useTerminal'
 export default defineComponent({
   components: { NodeItem },
   setup() {
-    const states = ref<NodeState[]>([])
-    const selectedStates = ref<NodeState[]>([])
-    const awaitingFirstState = ref(true)
-    const ctx = useContext()
-    const { $auth } = ctx
-    // @ts-ignore
-    ctx.onUnmounted = onUnmounted
-    let socket: any
-    onMounted(() => {
-      socket = ctx.$nuxtSocket({
-        auth: { token: ($auth.strategy as any).token.get() },
-      } as any)
-      socket.on('node/state', (data: NodeState) => {
-        const i = states.value?.findIndex((s) => s.host === data.host)
-        if (i > -1) Vue.set(states.value as Object, i, data)
-        else states.value.push(data)
-        awaitingFirstState.value = false
-      })
-    })
+    const { runInTerminal } = useTerminal()
+    const { states } = useNodesStore()
+    const socket = inject<any>('socket')
+    const selectedHosts = ref<AnsibleHost[]>([])
+    const selectedStates = computed<NodeState[]>(() =>
+      states.filter((s) => selectedHosts.value.includes(s.host))
+    )
 
     const pendingCount = computed(
-      () => states.value.filter((s) => !s.actionPending).length
+      () => states.filter((s) => !s.actionPending).length
+    )
+
+    watch(
+      states,
+      () => {
+        states.forEach((state) => {
+          if (state.actionPending) {
+            const i = selectedHosts.value?.findIndex((s) => s === state.host)
+            if (i > -1) Vue.delete(selectedHosts.value as Object, i)
+          }
+        })
+      },
+      { deep: true }
     )
 
     return {
       OS,
       states,
-      awaitingFirstState,
       selectedStates,
+      runInTerminal,
       indeterminate: computed(() => {
         return (
-          selectedStates.value.length > 0 &&
-          selectedStates.value.length < states.value.length
+          selectedHosts.value.length > 0 &&
+          selectedHosts.value.length < states.length - pendingCount.value
         )
       }),
       allSelected: computed(
-        () =>
-          selectedStates.value.length ===
-          states.value.length - pendingCount.value
+        () => selectedHosts.value.length !== states.length - pendingCount.value
       ),
       isSelected(state: NodeState) {
         return selectedStates.value.findIndex((s) => s === state) !== -1
       },
       select(state: NodeState) {
-        const i = selectedStates.value?.findIndex((s) => s === state)
-        if (i > -1) Vue.delete(selectedStates.value as Object, i)
-        else selectedStates.value.push(state)
+        const i = selectedHosts.value?.findIndex((s) => s === state.host)
+        if (i > -1) Vue.delete(selectedHosts.value as Object, i)
+        else selectedHosts.value.push(state.host)
       },
       selectAll() {
-        if (
-          selectedStates.value.length <=
-          states.value.length - pendingCount.value
-        )
-          selectedStates.value = [...states.value].filter(
-            (s) => !s.actionPending
-          )
-        else selectedStates.value = []
+        if (selectedHosts.value.length <= states.length - pendingCount.value)
+          selectedHosts.value = [...states]
+            .filter((s) => !s.actionPending)
+            .map((s) => s.host)
+        else selectedHosts.value = []
       },
       shutdown: _.throttle((...states: NodeState[]) => {
         states.forEach((state) => {
-          if (socket) socket.emit('node/shutdown', state)
+          if (socket.value) socket.value.emit('node/shutdown', state)
         })
       }, 1000),
       boot: _.throttle((os: OS, ...states: NodeState[]) => {
         states.forEach((state) => {
-          if (socket) socket.emit(`node/boot/${os}`, state)
+          if (socket.value) socket.value.emit(`node/boot/${os}`, state)
         })
       }, 1000),
     }

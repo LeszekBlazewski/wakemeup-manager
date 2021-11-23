@@ -74,4 +74,10 @@ export class ConfigService implements JwtOptionsFactory {
       [OS.WINDOWS]: process.env.GRUB_WINDOWS || 3,
     };
   }
+
+  public createWettyOptions() {
+    return {
+      address: 'http://localhost:3001',
+    };
+  }
 }

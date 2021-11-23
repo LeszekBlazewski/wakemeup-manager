@@ -5,6 +5,7 @@ import { ConfigModule } from 'src/config/config.module';
 import { ConfigService } from 'src/config/config.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtQueryStrategy } from './jwt-query.strategy';
 import { JwtRefreshStrategy } from './jwt-refresh.strategy';
 import { JwtStrategy } from './jwt.strategy';
 
@@ -18,7 +19,7 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtRefreshStrategy, JwtStrategy],
-  exports: [AuthService],
+  providers: [AuthService, JwtRefreshStrategy, JwtStrategy, JwtQueryStrategy],
+  exports: [AuthService, JwtQueryStrategy],
 })
 export class AuthModule {}

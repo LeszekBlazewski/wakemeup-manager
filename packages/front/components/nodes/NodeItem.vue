@@ -57,6 +57,7 @@
           small
           color="primary"
           class="ml-2"
+          @click="$emit('terminal')"
         >
           <v-icon> mdi-console-line </v-icon>
         </v-btn>
@@ -113,7 +114,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['select', 'shutdown', 'boot'],
+  emits: ['select', 'shutdown', 'boot', 'terminal'],
   setup(props) {
     return {
       OS,

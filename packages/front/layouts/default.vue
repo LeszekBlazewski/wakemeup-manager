@@ -1,21 +1,6 @@
 <template>
   <v-app dark>
     <v-navigation-drawer v-model="drawer" clipped fixed app>
-      <!--  <v-row v-if="user" dense class="mx-1 mt-4 text-center" justify="center">
-        <v-col :cols="12">
-          <v-avatar color="primary">
-            <v-icon>mdi-account</v-icon>
-          </v-avatar>
-        </v-col>
-        <v-col :cols="12">
-          <h3>
-            {{ user.name }}
-          </h3>
-        </v-col>
-      </v-row>
- -->
-      <!--       <v-divider /> -->
-
       <v-list>
         <v-list-item v-if="user" two-line>
           <v-list-item-avatar color="primary">
@@ -55,6 +40,20 @@
       </v-container>
     </v-main>
     <global-footer />
+
+    <v-snackbar v-model="snackbar.visible">
+      {{ snackbar.message }}
+      <template #action="{ attrs }">
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="snackbar.visible = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -62,11 +61,18 @@
 import {
   computed,
   defineComponent,
+  onMounted,
+  onUnmounted,
+  provide,
   ref,
   useContext,
 } from '@nuxtjs/composition-api'
+import Vue from 'vue'
 import { useNavigationStore } from '@/store/navigationStore'
 import GlobalFooter from '~/components/layout/GlobalFooter.vue'
+import { useNodesStore } from '~/store/nodesStore'
+import { useSnackbarStore } from '~/store/snackbarStore'
+import { NodeState } from '~/../api/dist/types'
 export default defineComponent({
   components: { GlobalFooter },
   auth: true,
@@ -76,7 +82,27 @@ export default defineComponent({
 
     const drawer = ref(true)
     const navigationStore = useNavigationStore()
+
+    const { states } = useNodesStore()
+    const ctx = useContext()
+    // @ts-ignore
+    ctx.onUnmounted = onUnmounted
+    const socket = ref<any | null>(null)
+    provide('socket', socket)
+    onMounted(() => {
+      socket.value = ctx.$nuxtSocket({
+        auth: { token: ($auth.strategy as any).token.get() },
+        path: '/cluster/socket.io',
+      } as any)
+      socket.value.on('node/state', (data: NodeState) => {
+        const i = states.findIndex((s) => s.host === data.host)
+        if (i > -1) Vue.set(states as Object, i, data)
+        else states.push(data)
+      })
+    })
+
     return {
+      snackbar: useSnackbarStore(),
       drawer,
       items: [
         {

@@ -7,7 +7,7 @@ export function useTerminal() {
   const router = useRouter()
 
   function getSshCommand(state: NodeState) {
-    return `ssh ${state.username}@${state.host}`
+    return `clear; ssh ${state.username}@${state.host}`
   }
   async function runInTerminal(state: NodeState) {
     await navigator.clipboard.writeText(getSshCommand(state))

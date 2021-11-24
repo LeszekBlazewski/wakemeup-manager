@@ -117,7 +117,6 @@ export default defineComponent({
           textarea.dispatchEvent(
             new ClipboardEvent('paste', { clipboardData: dto })
           )
-          await wait(10)
           textarea.dispatchEvent(
             new KeyboardEvent('keydown', { key: 'enter', keyCode: 13 })
           )
@@ -127,14 +126,15 @@ export default defineComponent({
 
     let observer: MutationObserver
     if (process.client) {
-      observer = new MutationObserver((c) => {
+      observer = new MutationObserver((changes) => {
         if (selectedState.value?.host)
-          c.forEach((c) => {
+          for (const c of changes) {
             if (!(c.target as HTMLElement).style.left.startsWith('0')) {
               enterCommand()
               observer.disconnect()
+              break
             }
-          })
+          }
       })
     }
 

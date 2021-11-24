@@ -11,7 +11,7 @@ import * as jwt from 'jsonwebtoken';
 import { NodesService } from './nodes.service';
 import { NodeState, OS } from 'src/types';
 
-@WebSocketGateway({ cors: true, path: '/cluster/socket.io' })
+@WebSocketGateway({ cors: true, path: '/api/cluster/socket.io' })
 export class NodesGateway {
   @WebSocketServer()
   public wsServer: Server;

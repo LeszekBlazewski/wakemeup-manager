@@ -5,12 +5,14 @@ import { useSnackbarStore } from "~/store/snackbarStore";
 export function useTerminal() {
   const { show } = useSnackbarStore()
   const router = useRouter()
-  async function runInTerminal(state: NodeState) {
-    await navigator.clipboard.writeText(
-    `ssh ${state.username}@${state.host}`
-    )
-    router.push('/app/terminal')
-    show('SSH command was copied to clipboard! Paste it in the terminal using CTRL+SHIFT+V')
+
+  function getSshCommand(state: NodeState) {
+    return `ssh ${state.username}@${state.host}`
   }
-  return {runInTerminal}
+  async function runInTerminal(state: NodeState) {
+    await navigator.clipboard.writeText(getSshCommand(state))
+    router.push('/app/terminal?host='+state.host)
+    show('SSH command was copied to clipboard just in case!')
+  }
+  return { runInTerminal, getSshCommand }
 }

@@ -9,6 +9,11 @@
       />
       Nodes
       <v-spacer />
+
+      <v-btn fab small color="primary" title="Check states" @click="refresh">
+        <v-icon> mdi-refresh </v-icon>
+      </v-btn>
+      <v-divider class="ml-2" vertical />
       <v-btn
         :disabled="
           !selectedStates.length || !selectedStates.some((s) => !s.alive)
@@ -78,6 +83,7 @@ import {
   defineComponent,
   inject,
   ref,
+  useContext,
   watch,
 } from '@nuxtjs/composition-api'
 import { AnsibleHost, NodeState, OS } from 'api'
@@ -86,19 +92,22 @@ import _ from 'lodash'
 import NodeItem from './NodeItem.vue'
 import { useNodesStore } from '~/store/nodesStore'
 import { useTerminal } from '@/composables/useTerminal'
+import { useSnackbarStore } from '~/store/snackbarStore'
 export default defineComponent({
   components: { NodeItem },
   setup() {
+    const { $axios } = useContext()
     const { runInTerminal } = useTerminal()
     const { states } = useNodesStore()
-    const socket = inject<any>('socket')
+    const { show } = useSnackbarStore()
+    const socket = inject<any>('socket', ref(null))
     const selectedHosts = ref<AnsibleHost[]>([])
     const selectedStates = computed<NodeState[]>(() =>
       states.filter((s) => selectedHosts.value.includes(s.host))
     )
 
     const pendingCount = computed(
-      () => states.filter((s) => !s.actionPending).length
+      () => states.filter((s) => s.actionPending).length
     )
 
     watch(
@@ -125,11 +134,13 @@ export default defineComponent({
           selectedHosts.value.length < states.length - pendingCount.value
         )
       }),
-      allSelected: computed(
-        () => selectedHosts.value.length !== states.length - pendingCount.value
-      ),
+      allSelected: computed(() => {
+        return selectedHosts.value.length === states.length - pendingCount.value
+      }),
       isSelected(state: NodeState) {
-        return selectedStates.value.findIndex((s) => s === state) !== -1
+        return (
+          selectedStates.value.findIndex((s) => s.host === state.host) !== -1
+        )
       },
       select(state: NodeState) {
         const i = selectedHosts.value?.findIndex((s) => s === state.host)
@@ -137,7 +148,7 @@ export default defineComponent({
         else selectedHosts.value.push(state.host)
       },
       selectAll() {
-        if (selectedHosts.value.length <= states.length - pendingCount.value)
+        if (selectedHosts.value.length < states.length - pendingCount.value)
           selectedHosts.value = [...states]
             .filter((s) => !s.actionPending)
             .map((s) => s.host)
@@ -153,10 +164,11 @@ export default defineComponent({
           if (socket.value) socket.value.emit(`node/boot/${os}`, state)
         })
       }, 1000),
+      refresh: _.throttle(() => {
+        $axios.get('nodes/check-states')
+        show('Refresh request sent. It happens automatically every 10s.')
+      }, 1000),
     }
   },
 })
 </script>
-
-<style scoped>
-</style>

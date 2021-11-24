@@ -77,29 +77,33 @@ export default defineComponent({
   components: { GlobalFooter },
   auth: true,
   setup() {
-    const { $auth, redirect } = useContext()
-    if (!$auth.loggedIn) redirect('/')
+    const { $auth } = useContext()
 
     const drawer = ref(true)
     const navigationStore = useNavigationStore()
 
-    const { states } = useNodesStore()
-    const ctx = useContext()
-    // @ts-ignore
-    ctx.onUnmounted = onUnmounted
-    const socket = ref<any | null>(null)
-    provide('socket', socket)
-    onMounted(() => {
-      socket.value = ctx.$nuxtSocket({
-        auth: { token: ($auth.strategy as any).token.get() },
-        path: '/cluster/socket.io',
-      } as any)
-      socket.value.on('node/state', (data: NodeState) => {
-        const i = states.findIndex((s) => s.host === data.host)
-        if (i > -1) Vue.set(states as Object, i, data)
-        else states.push(data)
+    if (process.client) {
+      const { states } = useNodesStore()
+      const ctx = useContext()
+      // @ts-ignore
+      ctx.onUnmounted = onUnmounted
+      const socket = ref<any | null>(null)
+      provide('socket', socket)
+      onMounted(() => {
+        socket.value = ctx.$nuxtSocket({
+          auth: { token: ($auth.strategy as any).token.get() },
+          path: '/api/cluster/socket.io',
+          autoConnect: false,
+        } as any)
+        socket.value.on('node/state', (data: NodeState) => {
+          const i = states.findIndex((s) => s.host === data.host)
+          if (i > -1) Vue.set(states as Object, i, data)
+          else states.push(data)
+        })
+
+        socket.value.connect()
       })
-    })
+    }
 
     return {
       snackbar: useSnackbarStore(),

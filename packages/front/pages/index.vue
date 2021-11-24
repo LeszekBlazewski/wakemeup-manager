@@ -110,7 +110,6 @@ import GlobalFooter from '~/components/layout/GlobalFooter.vue'
 export default defineComponent({
   components: { SigninSheet, GlobalFooter },
   layout: 'guest',
-  auth: 'guest',
   setup() {
     const { $auth } = useContext()
     const loading = ref(false)

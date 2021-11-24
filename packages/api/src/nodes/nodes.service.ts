@@ -112,12 +112,12 @@ export class NodesService {
   public async boot(state: NodeState, os: OS) {
     this.logger.log(`[Node ${state.host}] Boot requested with: ${os}`);
     this.bootTargets.set(state.host, os);
-    wol.wake(state.mac);
 
     /** Wait for boot */
     let afterState: NodeState;
     let waitPeriods = this.waitPeriods;
     do {
+      wol.wake(state.mac);
       await wait(1000);
       afterState = await this.checkState(state);
       this.setState(afterState);

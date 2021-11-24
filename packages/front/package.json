@@ -11,12 +11,10 @@
     "lint": "npm run lint:js"
   },
   "dependencies": {
-    "@nuxtjs/auth-next": "5.0.0-1624817847.21691f1",
+    "@nuxtjs/auth-next": "^5.0.0-1637745161.ea53f98",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/composition-api": "^0.30.0",
     "@pinia/nuxt": "^0.1.5",
-    "@types/lodash": "^4.14.177",
-    "@types/luxon": "^2.0.7",
     "@vuelidate/core": "^2.0.0-alpha.32",
     "@vuelidate/validators": "^2.0.0-alpha.25",
     "api": "^0.0.1",
@@ -27,7 +25,8 @@
     "nuxt-socket-io": "^1.1.24",
     "pinia": "^2.0.4",
     "vuetify": "^2.5.5",
-    "vuetify-confirm": "^2.0.6"
+    "vuetify-confirm": "^2.0.6",
+    "wait": "^0.4.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
@@ -36,6 +35,8 @@
     "@nuxtjs/eslint-config-typescript": "^6.0.1",
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/vuetify": "^1.12.1",
+    "@types/lodash": "^4.14.177",
+    "@types/luxon": "^2.0.7",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-nuxt": "^2.0.0",

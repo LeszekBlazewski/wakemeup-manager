@@ -7,14 +7,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useContext } from '@nuxtjs/composition-api'
+import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   auth: 'guest',
   setup() {
-    const { $auth, redirect } = useContext()
-    if ($auth.loggedIn) redirect('/app')
-
     return {}
   },
 })

@@ -46,7 +46,7 @@ export default {
   ],
 
   axios: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000/',
+    baseURL: process.env.BASE_URL || 'http://mgu.localhost/api/',
   },
 
   publicRuntimeConfig: {
@@ -56,7 +56,7 @@ export default {
     io: {
       sockets: [
         {
-          url: process.env.BASE_URL || 'http://localhost:3000/',
+          url: process.env.BASE_URL || 'http://mgu.localhost/',
           default: true,
         },
       ],
@@ -89,7 +89,7 @@ export default {
     redirect: {
       login: '/',
       logout: '/',
-      callback: '/app',
+      callback: '/',
       home: '/app',
     },
     strategies: {
@@ -105,9 +105,9 @@ export default {
           autoFetch: true,
         },
         endpoints: {
-          login: { url: '/auth/login', method: 'post' },
-          refresh: { url: '/auth/refresh', method: 'post' },
-          user: { url: '/auth/me', method: 'get' },
+          login: { url: 'auth/login', method: 'post' },
+          refresh: { url: 'auth/refresh', method: 'post' },
+          user: { url: 'auth/me', method: 'get' },
         },
       },
     },
@@ -116,13 +116,17 @@ export default {
   io: {
     sockets: [
       {
-        url: process.env.BASE_URL || 'http://localhost:3000/',
+        url: process.env.BASE_URL || 'http://mgu.localhost/',
         default: true,
       },
     ],
   },
 
   server: {
-    port:3002
+    port: 3002,
+  },
+
+  router: {
+    middleware:['auth']
   }
 }

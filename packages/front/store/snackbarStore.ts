@@ -5,7 +5,7 @@ export const useSnackbarStore = defineStore('snackbar', {
     visible: false,
     message:'',
     timeout: 10000,
-    timeoutId: null as (null | ReturnType<typeof setTimeout>),
+    timeoutId: null as (null | number),
   }),
   actions: {
     show(message: string):void {
@@ -13,7 +13,7 @@ export const useSnackbarStore = defineStore('snackbar', {
         clearTimeout(this.timeoutId)
       this.message = message
       this.visible = true
-      this.timeoutId = setTimeout(() => {
+      this.timeoutId = +setTimeout(() => {
         this.visible = false
       }, this.timeout)
     }

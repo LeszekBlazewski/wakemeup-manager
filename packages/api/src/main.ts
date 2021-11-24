@@ -8,6 +8,7 @@ export const appRef = { value: null };
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.setGlobalPrefix('api');
 
   const options = new DocumentBuilder()
     .addBearerAuth()

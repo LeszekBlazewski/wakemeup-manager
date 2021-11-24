@@ -24,7 +24,7 @@ export class AppService implements OnModuleInit {
         cors(),
         cookieParser(),
         passport.authenticate('jwt-query', { session: false }),
-        createProxyMiddleware('/wetty', {
+        createProxyMiddleware('/api/wetty', {
           target: this.configService.createWettyOptions().address,
           changeOrigin: false,
           ws: true,

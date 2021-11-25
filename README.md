@@ -31,6 +31,11 @@ GRUB_TIMEOUT_STYLE=menu
 GRUB_TIMEOUT={{GRUB menu timeout, let's set it to '1'}}
 ```
 
+Don't forget to update GRUB:
+```
+sudo update-grub
+```
+
 In `docker-compose.yaml` you can set the env variables according to the port set in the GRUB config and OS's position in GRUB menu. Remember to adjust other port, related settings. Remember that TFTP is based on UDP.
 
 ```yml

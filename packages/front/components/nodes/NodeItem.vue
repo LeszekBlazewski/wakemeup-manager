@@ -81,7 +81,7 @@
           class="ml-2"
           @click="$emit('boot', OS.WINDOWS)"
         >
-          <img style="width: 20px" :src="require('@/assets/windows.png')" />
+          <v-icon> mdi-microsoft-windows </v-icon>
         </v-btn>
         <v-btn
           v-if="!state.alive"

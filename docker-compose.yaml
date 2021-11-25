@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  proxy:
+    build: ./proxy
+    ports:
+      - "7000:80"
+
+  api:
+    build: .
+    command: npx lerna run --scope api --stream start:prod
+    ports:
+      - 6969:6969/udp
+      - 3000
+    environment:
+      - AUTH_USERNAME=mgu-master
+      - AUTH_PASSWORD=password
+      - ANSIBLE_INVENTORY=/data/inventory.yml
+      - SECRET=secret
+      - EXPIRES_IN=1d
+      - SECRET_REFRESH=topsecret
+      - REFRESH_EXPIRES_IN=1d
+      - REFRESH_REMEMBER_EXPIRES_IN=7d
+      - SSH_PRIVATE_KEY=/keys/id_ed25519
+      - TFTP_PORT=6969
+      - GRUB_UBUNTU=0
+      - GRUB_WINDOWS=3
+      - WETTY_URL=http://wetty:3001/
+    volumes:
+      - ./packages/api/test/data:/data
+      - /home/damian_koper/.ssh/:/keys
+
+  front:
+    build: .
+    command: npx lerna run --scope front --stream start
+    ports:
+      - 3002
+    environment:
+      - BASE_URL=http://localhost:7000/api/
+      - BASE_URL_SOCKET=http://localhost:7000/
+
+  wetty:
+    image: wettyoss/wetty
+    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user pi --ssh-host
+      192.168.0.141 --ssh-key /keys/id_ed25519 --ssh-auth publickey,password"
+    ports:
+      - 3001
+    volumes:
+      - /home/damian_koper/.ssh/:/keys

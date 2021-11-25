@@ -21,8 +21,8 @@ export class NodesService {
     this.initStates();
 
     const tftp = TFTP.createServer();
-    tftp.bind(configService.createTftpOptions());
     tftp.register(this.handleTFTP.bind(this));
+    tftp.bind(configService.createTftpOptions());
   }
 
   private initStates() {

@@ -51,15 +51,27 @@ export default {
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: process.env.BASE_URL,
+      baseURL: process.env.BASE_URL || 'http://mgu.localhost/api/'
     },
-    io: {
+    io: {  // will be available in this.$config.io (client-side)
       sockets: [
         {
-          url: process.env.BASE_URL || 'http://mgu.localhost/',
-          default: true,
-        },
-      ],
+          default:true,
+          name: 'socket',
+          url: process.env.BASE_URL_SOCKET || 'http://mgu.localhost/'
+        }
+      ]
+    }
+  },
+  privateRuntimeConfig: {
+    io: { // will be available in this.$config.io (server-side)
+      sockets: [
+        {
+          default:true,
+          name: 'socket',
+          url: process.env.BASE_URL_SOCKET || 'http://mgu.localhost/'
+        }
+      ]
     }
   },
 
@@ -113,17 +125,9 @@ export default {
     },
   },
 
-  io: {
-    sockets: [
-      {
-        url: process.env.BASE_URL || 'http://mgu.localhost/',
-        default: true,
-      },
-    ],
-  },
-
   server: {
     port: 3002,
+    host: '0.0.0.0'
   },
 
   router: {

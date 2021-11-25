@@ -31,10 +31,6 @@ export class ConfigService implements JwtOptionsFactory {
     return process.env.NODE_ENV !== 'production';
   }
 
-  public baseUrl() {
-    return process.env.BASE_URL || 'localhost';
-  }
-
   public createSecretOptions() {
     return {
       secret: process.env.SECRET || 'topSecret',
@@ -61,8 +57,8 @@ export class ConfigService implements JwtOptionsFactory {
 
   public createTftpOptions() {
     return {
-      port: process.env.TFTP_PORT || 6969,
-      address: process.env.TFTP_ADDRESS || undefined,
+      port: +process.env.TFTP_PORT || 6969,
+      address: undefined,
       exclusive: true,
     };
   }
@@ -70,14 +66,14 @@ export class ConfigService implements JwtOptionsFactory {
   /** GRUB boot option index  */
   public createBootOptions() {
     return {
-      [OS.UBUNTU]: process.env.GRUB_UBUNTU || 0,
-      [OS.WINDOWS]: process.env.GRUB_WINDOWS || 3,
+      [OS.UBUNTU]: +process.env.GRUB_UBUNTU || 0,
+      [OS.WINDOWS]: +process.env.GRUB_WINDOWS || 3,
     };
   }
 
   public createWettyOptions() {
     return {
-      address: 'http://localhost:3001',
+      address: process.env.WETTY_URL || 'http://localhost:3001',
     };
   }
 }

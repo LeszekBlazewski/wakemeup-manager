@@ -74,7 +74,6 @@
       </v-list>
     </v-card-text>
   </v-card>
-  <!-- TODO: vuetify-confirm on {boot, shutdown} -->
 </template>
 
 <script lang="ts">

@@ -1,14 +1,14 @@
-# 1. Downloads and loads REG file containing all necessary options for enablig WoL 
+# 1. Downloads and loads REG file containing all necessary options for enabling WoL 
 # 2. Configures windows to start SSH server
 # 3. Allows ICMP traffic
-# on windows 10 inisde 229 lab.
+# on windows 10 inside 229 lab.
 
 $config_folder_uri="https://raw.githubusercontent.com/LeszekBlazewski/lab-229-cluster/master/wol/windows"
 
 # WoL setup
 $reg_file_name = "enableWol.reg"
 Invoke-WebRequest -Uri "${config_folder_uri}/${reg_file_name}" -OutFile $reg_file_name
-# Import the fil using reg programm
+# Import the file using reg programm
 reg import $reg_file_name
 Write-Output "Registry entries for WoL and startup modified successfully."
 Remove-Item $reg_file_name 

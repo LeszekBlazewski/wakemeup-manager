@@ -8,8 +8,6 @@ export const useNodesStore = defineStore('nodes', {
   }),
   actions: {
     beat() {
-      console.log(this);
-
       this.heartbeat = (this.heartbeat+1)%2
     }
   }

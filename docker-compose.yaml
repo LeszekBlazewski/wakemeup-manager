@@ -23,7 +23,7 @@ services:
       - REFRESH_EXPIRES_IN=${REFRESH_EXPIRES_IN:-1d}
       - REFRESH_REMEMBER_EXPIRES_IN=${REFRESH_REMEMBER_EXPIRES_IN:-7d}
       - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY:-/app/config/lab229}
-      - STATE_CHCEK_INTERVAL=${STATE_CHCEK_INTERVAL:-10}
+      - STATE_CHECK_INTERVAL=${STATE_CHECK_INTERVAL:-10}
       - TFTP_PORT=${TFTP_PORT:-6969}
       - GRUB_UBUNTU=${GRUB_UBUNTU:-0}
       - GRUB_WINDOWS=${GRUB_WINDOWS:-3}
@@ -41,7 +41,8 @@ services:
 
   wetty:
     image: wettyoss/wetty
-    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
+    command:
+      "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
       --ssh-host ${SSH_HOST:-192.168.0.141} --ssh-key
       ${SSH_PRIVATE_KEY:-/app/config/lab229} --ssh-auth publickey,password"
     volumes:

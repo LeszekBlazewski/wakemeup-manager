@@ -17,7 +17,7 @@ export class NodesController {
     this.checkStates();
   }
 
-  @Cron(`*/${process.env.STATE_CHCEK_INTERVAL || 10} * * * * *`)
+  @Cron(`*/${process.env.STATE_CHECK_INTERVAL || 10} * * * * *`)
   @Get('check-states')
   public checkStates() {
     const oldStates = this.nodesService.getStates();

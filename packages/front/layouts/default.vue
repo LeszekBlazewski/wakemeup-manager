@@ -83,7 +83,7 @@ export default defineComponent({
     const navigationStore = useNavigationStore()
 
     if (process.client) {
-      const { states } = useNodesStore()
+      const { states, beat } = useNodesStore()
       const ctx = useContext()
       // @ts-ignore
       ctx.onUnmounted = onUnmounted
@@ -99,6 +99,7 @@ export default defineComponent({
           const i = states.findIndex((s) => s.host === data.host)
           if (i > -1) Vue.set(states as Object, i, data)
           else states.push(data)
+          beat()
         })
 
         socket.value.connect()

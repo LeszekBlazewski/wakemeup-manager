@@ -1,1 +1,6 @@
 node_modules
+.env
+
+config/inventory.yml
+config/lab229
+config/id_ed25519

@@ -9,7 +9,7 @@ npx lerna-dockerize
 
 ### Running the stack
 ``` sh
-docker-compose -f docker-compose.yaml up -d --build
+docker-compose up -d --build
 ```
 
 ### GRUB Config

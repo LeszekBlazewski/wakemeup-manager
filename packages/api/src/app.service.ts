@@ -17,6 +17,7 @@ export class AppService implements OnModuleInit {
     /** Terminal proxy - secured proxy workaround around nest */
     const app = appRef.value;
     const passport = (this.jwtQueryStrategy as any).getPassportInstance();
+    const options = this.configService.createWettyOptions();
     app
       .getHttpAdapter()
       .getInstance()
@@ -24,8 +25,8 @@ export class AppService implements OnModuleInit {
         cors(),
         cookieParser(),
         passport.authenticate('jwt-query', { session: false }),
-        createProxyMiddleware('/api/wetty', {
-          target: this.configService.createWettyOptions().address,
+        createProxyMiddleware(options.proxy, {
+          target: options.target,
           changeOrigin: false,
           ws: true,
         }),

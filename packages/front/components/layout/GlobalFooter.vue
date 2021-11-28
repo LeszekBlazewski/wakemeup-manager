@@ -19,16 +19,30 @@
       {{ new Date().getFullYear() }}
     </span>
     <v-spacer />
-    Made with ❤️
+    <span title="Nodes heartbeat" style="cursor: pointer">
+      Made with
+      <template v-if="throttledHB">❤️</template>
+      <template v-else>💚</template>
+    </span>
   </v-footer>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
+import { defineComponent, ref, watch } from '@nuxtjs/composition-api'
+import _ from 'lodash'
+import { useNodesStore } from '~/store/nodesStore'
 export default defineComponent({
   setup() {
-    return {}
+    const throttledHB = ref(true)
+    const { $state } = useNodesStore()
+    watch(
+      () => $state.heartbeat,
+      _.throttle(() => {
+        throttledHB.value = !throttledHB.value
+      }, 50)
+    )
+
+    return { throttledHB }
   },
 })
 </script>

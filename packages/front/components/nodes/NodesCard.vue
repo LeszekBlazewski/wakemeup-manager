@@ -165,7 +165,9 @@ export default defineComponent({
       }, 1000),
       refresh: _.throttle(() => {
         $axios.get('nodes/check-states')
-        show('Refresh request sent. It happens automatically every 10s.')
+        show(
+          'Refresh request sent. It happens automatically at configured interval.'
+        )
       }, 1000),
     }
   },

@@ -19,7 +19,7 @@ export class ConfigService implements JwtOptionsFactory {
   public createInventoryPath() {
     return (
       process.env.ANSIBLE_INVENTORY ||
-      resolve(__dirname, '../../test/data/inventory.yml')
+      resolve(__dirname, '../../../../config/inventory.yml')
     );
   }
 
@@ -51,7 +51,7 @@ export class ConfigService implements JwtOptionsFactory {
   public createPrivateKeyPath() {
     return (
       process.env.SSH_PRIVATE_KEY ||
-      resolve('/home/damian_koper/.ssh/id_ed25519')
+      resolve(__dirname, '../../../../config/id_ed25519')
     );
   }
 
@@ -73,7 +73,8 @@ export class ConfigService implements JwtOptionsFactory {
 
   public createWettyOptions() {
     return {
-      address: process.env.WETTY_URL || 'http://localhost:3001',
+      proxy: process.env.WETTY_PROXY_URL || '/api/wetty',
+      target: process.env.WETTY_TARGET_URL || 'http://localhost:3001',
     };
   }
 }

@@ -30,4 +30,8 @@ autoinstall:
   packages:
     - xauth
   late-commands:
-    - sed -i 's/#X11Forwarding yes/X11Forwarding yes/' /target/etc/ssh/sshd_config
+    [
+      "sed -i 's/#X11Forwarding yes/X11Forwarding yes/' /target/etc/ssh/sshd_config",
+      "echo 'lab ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown' > /target/etc/sudoers.d/labnopass",
+      "chmod 440 /target/etc/sudoers.d/labnopass",
+    ]

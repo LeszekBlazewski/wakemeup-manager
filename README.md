@@ -19,6 +19,7 @@ insmod net
 insmod efinet
 insmod tftp
 
+net_bootp
 source (tftp,{{master-ip}}:6969)/grub_config
 ```
 * The filename `grub_config` doesn't really matter, any string would be ok.

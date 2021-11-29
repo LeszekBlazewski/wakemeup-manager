@@ -7,8 +7,9 @@ import { Inventory, AnsibleHost } from './interfaces/Inventory.interface';
 import execa from 'execa';
 import SSH2Promise from 'ssh2-promise';
 import wait from 'wait';
-import TFTP from 'tftp-server';
+import TFTP from 'tftp';
 import wol from 'wol';
+import { Readable } from 'stream';
 
 @Injectable()
 export class NodesService {
@@ -20,9 +21,14 @@ export class NodesService {
   constructor(private configService: ConfigService) {
     this.initStates();
 
-    const tftp = TFTP.createServer();
-    tftp.register(this.handleTFTP.bind(this));
-    tftp.bind(configService.createTftpOptions());
+    const tftp = TFTP.createServer(
+      {
+        host: '0.0.0.0',
+        ...configService.createTftpOptions(),
+      },
+      this.handleTFTP.bind(this),
+    );
+    tftp.listen();
   }
 
   private initStates() {
@@ -134,10 +140,14 @@ export class NodesService {
   }
 
   private handleTFTP(req, res) {
-    const address = /(\d+\.\d+\.\d+\.\d+)$/gm.exec(req.address)[1];
+    const address = req.stats.remoteAddress;
     const bootOS = this.bootTargets.get(address) || OS.WINDOWS;
     const bootTarget = this.configService.createBootOptions()[bootOS];
+
     this.logger.log(`[Node ${address}] GRUB boot with: ${bootOS}`);
-    res(Buffer.from(`set GRUB_DEFAULT="${bootTarget}"`, 'utf-8'));
+
+    const message = `set GRUB_DEFAULT="${bootTarget}"`;
+    res.setSize(message.length);
+    res.end(message);
   }
 }

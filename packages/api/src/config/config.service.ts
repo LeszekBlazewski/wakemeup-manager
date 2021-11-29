@@ -58,8 +58,6 @@ export class ConfigService implements JwtOptionsFactory {
   public createTftpOptions() {
     return {
       port: +process.env.TFTP_PORT || 6969,
-      address: undefined,
-      exclusive: true,
     };
   }
 

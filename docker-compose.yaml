@@ -18,7 +18,7 @@ services:
       - AUTH_PASSWORD=${AUTH_PASSWORD:-password}
       - ANSIBLE_INVENTORY=${ANSIBLE_INVENTORY:-/app/config/inventory.yml}
       - SECRET=${SECRET:-secret}
-      - EXPIRES_IN=${EXPIRES_IN:-1d}
+      - EXPIRES_IN=${EXPIRES_IN:-1h}
       - SECRET_REFRESH=${SECRET_REFRESH:-topsecret}
       - REFRESH_EXPIRES_IN=${REFRESH_EXPIRES_IN:-1d}
       - REFRESH_REMEMBER_EXPIRES_IN=${REFRESH_REMEMBER_EXPIRES_IN:-7d}
@@ -41,8 +41,7 @@ services:
 
   wetty:
     image: wettyoss/wetty
-    command:
-      "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
+    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
       --ssh-host ${SSH_HOST:-192.168.0.141} --ssh-key
       ${SSH_PRIVATE_KEY:-/app/config/lab229} --ssh-auth publickey,password"
     volumes:

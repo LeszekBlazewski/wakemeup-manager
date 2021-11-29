@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app dark style="margin-bottom: -48px">
     <v-main>
       <v-container style="position: relative" class="fill-height">
         <v-row align="center" justify="center" class="mb-2 mb-sm-0">
@@ -154,53 +154,6 @@ export default defineComponent({
     title: 'Sign in',
   },
 })
-/*  @Action('user/login') loginAction!: (payload: {
-    username: string
-    password: string
-  }) => Promise<AxiosResponse>
-
-  @Action('user/fetchAuthUser') fetchAuthUserAction!: () => Promise<void>
-  @Validate({ required })
-  username = ''
-
-  @Validate({ required })
-  password = ''
-
-  rememberMe = false
-  alertInfo = ''
-  alertVisible = false
-  loading = false
-  async submit() {
-    this.$v.$touch()
-    if (this.$v.$error) return
-    try {
-      this.loading = true
-      await this.loginAction(this)
-      await this.fetchAuthUserAction()
-      this.$router.push({ name: 'Dashboard' })
-    } catch (e) {
-      this.loading = false
-      const response = (e as AxiosError).response
-      switch (response?.status) {
-        case 403:
-          this.showAlert(
-            'Użytkownik nie jest aktywny! Skontaktuj się z administratorem!'
-          )
-          break
-        case 404:
-          this.showAlert('Nieprawidłowa nazwa użytkownika lub hasło!')
-          break
-        case 500:
-          this.showAlert('Błąd serwera! Skontaktuj się z administratorem!')
-          break
-      }
-    }
-  }
-
-  showAlert(message: string) {
-    this.alertInfo = message
-    this.alertVisible = true
-  } */
 </script>
 
 <style scoped lang="scss"></style>

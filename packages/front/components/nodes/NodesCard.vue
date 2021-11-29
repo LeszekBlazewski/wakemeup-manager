@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="!states.length">
+  <v-card :loading="!store.states.length">
     <v-card-title>
       <v-simple-checkbox
         :indeterminate="indeterminate"
@@ -57,7 +57,7 @@
     <v-card-text>
       <v-list>
         <node-item
-          v-for="state in states"
+          v-for="state in store.states"
           :key="state.host"
           :state="state"
           :selected="isSelected(state)"
@@ -66,7 +66,7 @@
           @boot="(os) => boot(os, state)"
           @terminal="runInTerminal(state)"
         />
-        <v-list-item v-if="!states.length">
+        <v-list-item v-if="!store.states.length">
           <v-list-item-content class="justify-center">
             No hosts defined in the inventory
           </v-list-item-content>
@@ -97,46 +97,47 @@ export default defineComponent({
   setup() {
     const { $axios } = useContext()
     const { runInTerminal } = useTerminal()
-    const { states } = useNodesStore()
+    const store = useNodesStore()
     const { show } = useSnackbarStore()
     const socket = inject<any>('socket', ref(null))
     const selectedHosts = ref<AnsibleHost[]>([])
     const selectedStates = computed<NodeState[]>(() =>
-      states.filter((s) => selectedHosts.value.includes(s.host))
+      store.states.filter((s) => selectedHosts.value.includes(s.host))
     )
 
     const pendingCount = computed(
-      () => states.filter((s) => s.actionPending).length
+      () => store.states.filter((s) => s.actionPending).length
     )
 
     watch(
-      states,
+      () => store.states,
       () => {
-        states.forEach((state) => {
+        store.states.forEach((state) => {
           if (state.actionPending) {
             const i = selectedHosts.value?.findIndex((s) => s === state.host)
             if (i > -1) Vue.delete(selectedHosts.value as Object, i)
           }
         })
       },
-      { deep: true }
+      { deep: true, immediate: true }
     )
 
     return {
       OS,
-      states,
+      store,
       selectedStates,
       runInTerminal,
       indeterminate: computed(() => {
         return (
           selectedHosts.value.length > 0 &&
-          selectedHosts.value.length < states.length - pendingCount.value
+          selectedHosts.value.length < store.states.length - pendingCount.value
         )
       }),
       allSelected: computed(() => {
         return (
-          selectedHosts.value.length === states.length - pendingCount.value &&
-          states.length - pendingCount.value > 0
+          selectedHosts.value.length ===
+            store.states.length - pendingCount.value &&
+          store.states.length - pendingCount.value > 0
         )
       }),
       isSelected(state: NodeState) {
@@ -150,8 +151,11 @@ export default defineComponent({
         else selectedHosts.value.push(state.host)
       },
       selectAll() {
-        if (selectedHosts.value.length < states.length - pendingCount.value)
-          selectedHosts.value = [...states]
+        if (
+          selectedHosts.value.length <
+          store.states.length - pendingCount.value
+        )
+          selectedHosts.value = [...store.states]
             .filter((s) => !s.actionPending)
             .map((s) => s.host)
         else selectedHosts.value = []

@@ -36,8 +36,8 @@ services:
     build: .
     command: npx lerna run --scope front --stream start
     environment:
-      - BASE_URL=/api/
-      - BASE_URL_SOCKET=/
+      - BASE_URL=${BASE_URL:-http://mgu.localhost/}api/
+      - BASE_URL_SOCKET=${BASE_URL:-http://mgu.localhost/}
 
   wetty:
     image: wettyoss/wetty

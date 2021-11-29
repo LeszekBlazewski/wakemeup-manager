@@ -134,7 +134,10 @@ export default defineComponent({
         )
       }),
       allSelected: computed(() => {
-        return selectedHosts.value.length === states.length - pendingCount.value
+        return (
+          selectedHosts.value.length === states.length - pendingCount.value &&
+          states.length - pendingCount.value > 0
+        )
       }),
       isSelected(state: NodeState) {
         return (

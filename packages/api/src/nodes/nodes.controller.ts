@@ -24,7 +24,7 @@ export class NodesController {
     oldStates.forEach(async (state) => {
       const newState = await this.nodesService.checkState(state);
       /** Action reports state on success or timeout - report not pending only */
-      if (!state.actionPending) {
+      if (!this.nodesService.getState(state.host).actionPending) {
         this.nodesService.setState(newState);
         this.nodesGateway.emitStates(newState);
       }

@@ -138,6 +138,6 @@ export class NodesService {
     const bootOS = this.bootTargets.get(address) || OS.WINDOWS;
     const bootTarget = this.configService.createBootOptions()[bootOS];
     this.logger.log(`[Node ${address}] GRUB boot with: ${bootOS}`);
-    res(Buffer.from(`set GRUB_DEFAULT="${bootTarget}"`), req);
+    res(Buffer.from(`set GRUB_DEFAULT="${bootTarget}"`, 'utf-8'));
   }
 }

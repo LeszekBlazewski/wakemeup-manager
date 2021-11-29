@@ -75,7 +75,6 @@ import { useSnackbarStore } from '~/store/snackbarStore'
 import { NodeState } from '~/../api/dist/types'
 export default defineComponent({
   components: { GlobalFooter },
-  auth: true,
   setup() {
     const { $auth } = useContext()
 

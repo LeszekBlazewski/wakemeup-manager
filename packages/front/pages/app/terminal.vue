@@ -51,13 +51,13 @@ import {
   useContext,
   watch,
 } from '@nuxtjs/composition-api'
-import wait from 'wait'
 import { NodeState, OS } from '~/../api/dist/types'
 import { useTerminal } from '~/composables/useTerminal'
 import { useNavigationStore } from '~/store/navigationStore'
 import { useNodesStore } from '~/store/nodesStore'
 
 export default defineComponent({
+  auth: true,
   middleware() {
     useNavigationStore().title = 'Terminal'
   },

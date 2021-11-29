@@ -10,7 +10,6 @@
 import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
-  auth: 'guest',
   setup() {
     return {}
   },

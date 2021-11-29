@@ -12,6 +12,7 @@ import NodesCard from '~/components/nodes/NodesCard.vue'
 import { useNavigationStore } from '~/store/navigationStore'
 
 export default defineComponent({
+  auth: true,
   components: { NodesCard },
   middleware() {
     useNavigationStore().title = 'Dashboard'

@@ -95,7 +95,9 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    parallel: true
+  },
 
   auth: {
     redirect: {
@@ -132,6 +134,6 @@ export default {
   },
 
   router: {
-    middleware:['auth']
+    middleware: ['auth']
   }
 }

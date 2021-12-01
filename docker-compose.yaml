@@ -5,14 +5,17 @@ services:
     image: nginx:1.21.4-alpine
     volumes:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - "api:172.17.0.1"
     ports:
       - 80:80
 
   api:
     build: .
     command: npx lerna run --scope api --stream start:prod
-    ports:
-      - 6969:6969/udp
+    network_mode: host # needed for sending WoL packets
+    # ports: # when running in host network ports section is ignored
+    # - 6969:6969/udp
     environment:
       - AUTH_USERNAME=${AUTH_USERNAME:-mgu-master}
       - AUTH_PASSWORD=${AUTH_PASSWORD:-password}
@@ -27,7 +30,7 @@ services:
       - TFTP_PORT=${TFTP_PORT:-6969}
       - GRUB_UBUNTU=${GRUB_UBUNTU:-0}
       - GRUB_WINDOWS=${GRUB_WINDOWS:-3}
-      - WETTY_TARGET_URL=http://wetty:3001/
+      - WETTY_TARGET_URL=http://localhost:3001/ # for docker communication http://wetty:3001/
       - WETTY_PROXY_URL=/api/wetty
     volumes:
       - ./config:/app/config:ro
@@ -36,12 +39,13 @@ services:
     build: .
     command: npx lerna run --scope front --stream start
     environment:
-      - BASE_URL=${BASE_URL:-http://mgu.localhost/}api/
-      - BASE_URL_SOCKET=${BASE_URL:-http://mgu.localhost/}
+      - BASE_URL=${BASE_URL:-http://localhost}
 
   wetty:
     image: wettyoss/wetty
-    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
+    network_mode: host # needed for api communication
+    command:
+      "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
       --ssh-host ${SSH_HOST:-192.168.0.141} --ssh-key
       ${SSH_PRIVATE_KEY:-/app/config/lab229} --ssh-auth publickey,password"
     volumes:

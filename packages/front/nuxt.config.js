@@ -23,7 +23,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    
+
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -47,19 +47,19 @@ export default {
   ],
 
   axios: {
-    baseURL: process.env.BASE_URL || 'http://mgu.localhost/api/',
+    baseURL: `${process.env.BASE_URL}/api/` || 'http://mgu.localhost/api/',
   },
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: process.env.BASE_URL || 'http://mgu.localhost/api/'
+      baseURL: `${process.env.BASE_URL}/api/` || 'http://mgu.localhost/api/'
     },
     io: {  // will be available in this.$config.io (client-side)
       sockets: [
         {
           default:true,
           name: 'socket',
-          url: process.env.BASE_URL_SOCKET || 'http://mgu.localhost/'
+          url: `${process.env.BASE_URL}/` || 'http://mgu.localhost/'
         }
       ]
     }
@@ -70,7 +70,7 @@ export default {
         {
           default:true,
           name: 'socket',
-          url: process.env.BASE_URL_SOCKET || 'http://mgu.localhost/'
+          url: `${process.env.BASE_URL}/` || 'http://mgu.localhost/'
         }
       ]
     }

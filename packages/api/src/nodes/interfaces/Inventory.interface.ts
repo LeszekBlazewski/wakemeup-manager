@@ -5,6 +5,7 @@ interface Host {
   mac_address: string;
   name: string;
   username: string;
+  username_windows: string;
 }
 
 export interface Inventory {

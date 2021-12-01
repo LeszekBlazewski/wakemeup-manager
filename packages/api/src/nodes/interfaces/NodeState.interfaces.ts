@@ -11,5 +11,6 @@ export interface NodeState {
   os: OS;
   name: string;
   username: string;
+  usernameWindows: string;
   actionPending: boolean;
 }

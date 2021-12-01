@@ -9,7 +9,6 @@ import SSH2Promise from 'ssh2-promise';
 import wait from 'wait';
 import TFTP from 'tftp';
 import wol from 'wol';
-import { Readable } from 'stream';
 
 @Injectable()
 export class NodesService {
@@ -46,6 +45,7 @@ export class NodesService {
           os: OS.WINDOWS,
           name: host.name,
           username: host.username,
+          usernameWindows: host.username_windows,
           timestamp: new Date().getTime(),
           actionPending: false,
         };
@@ -146,7 +146,7 @@ export class NodesService {
 
     this.logger.log(`[Node ${address}] GRUB boot with: ${bootOS}`);
 
-    const message = `set GRUB_DEFAULT="${bootTarget}"`;
+    const message = `set default="${bootTarget}"`;
     res.setSize(message.length);
     res.end(message);
   }

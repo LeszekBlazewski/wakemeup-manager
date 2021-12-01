@@ -1,5 +1,5 @@
 import { useRouter } from "@nuxtjs/composition-api";
-import { NodeState } from "~/../api/dist/types";
+import { NodeState, OS } from "~/../api/dist/types";
 import { useSnackbarStore } from "~/store/snackbarStore";
 
 export function useTerminal() {
@@ -7,7 +7,10 @@ export function useTerminal() {
   const router = useRouter()
 
   function getSshCommand(state: NodeState) {
-    return `clear; ssh ${state.username}@${state.host}`
+    if (state.os === OS.UBUNTU)
+      return `clear; ssh ${state.username}@${state.host}`
+    else
+      return `clear; ssh ${state.usernameWindows}@${state.host}`
   }
   async function runInTerminal(state: NodeState) {
     router.push('/app/terminal?host=' + state.host)

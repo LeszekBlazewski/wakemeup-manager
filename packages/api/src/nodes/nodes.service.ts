@@ -27,6 +27,9 @@ export class NodesService {
       },
       this.handleTFTP.bind(this),
     );
+    tftp.on('error', (e) => {
+      this.logger.error(e);
+    });
     tftp.listen();
   }
 
@@ -140,6 +143,10 @@ export class NodesService {
   }
 
   private handleTFTP(req, res) {
+    req.on('error', (e) => {
+      this.logger.error(e);
+    });
+
     const address = req.stats.remoteAddress;
     const bootOS = this.bootTargets.get(address) || OS.WINDOWS;
     const bootTarget = this.configService.createBootOptions()[bootOS];

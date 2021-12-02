@@ -47,19 +47,19 @@ export default {
   ],
 
   axios: {
-    baseURL: process.env.BASE_URL ? `${process.env.BASE_URL}/api/` : 'http://mgu.localhost/api/',
+    baseURL: `${process.env.BASE_URL || 'http://mgu.localhost'}/api/`,
   },
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: process.env.BASE_URL ? `${process.env.BASE_URL}/api/` : 'http://mgu.localhost/api/'
+      baseURL: `${process.env.BASE_URL || 'http://mgu.localhost'}/api/`
     },
     io: {  // will be available in this.$config.io (client-side)
       sockets: [
         {
           default: true,
           name: 'socket',
-          url: process.env.BASE_URL ? `${process.env.BASE_URL}/` : 'http://mgu.localhost/'
+          url: `${process.env.BASE_URL || 'http://mgu.localhost'}/`
         }
       ]
     }
@@ -70,7 +70,7 @@ export default {
         {
           default: true,
           name: 'socket',
-          url: process.env.BASE_URL ? `${process.env.BASE_URL}/` : 'http://mgu.localhost/'
+          url: `${process.env.BASE_URL || 'http://mgu.localhost'}/`
         }
       ]
     }
@@ -95,12 +95,7 @@ export default {
     }
   },
 
-  // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {
-    parallel: true
-  },
-
-  auth: {
+  // Build Configuration: https://go.nuxtjs.dev/config-buildprocess.env.BASE_URL ? `${process.env.BASE_URL}/` : 'http://mgu.localhost/'
     redirect: {
       login: '/',
       logout: '/',

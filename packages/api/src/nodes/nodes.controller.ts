@@ -22,9 +22,9 @@ export class NodesController {
   public checkStates() {
     const oldStates = this.nodesService.getStates();
     oldStates.forEach(async (state) => {
-      const newState = await this.nodesService.checkState(state);
       /** Action reports state on success or timeout - report not pending only */
-      if (!this.nodesService.getState(state.host).actionPending) {
+      if (!state.actionPending) {
+        const newState = await this.nodesService.checkState(state);
         this.nodesService.setState(newState);
         this.nodesGateway.emitStates(newState);
       }

@@ -45,6 +45,10 @@ Write-Output "SSH password authentication disabled and key auth enabled successf
 # Change default shell to powershell instead of cmd
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -Force
 
+# Allow RDP connections
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
 # ICMP firewall rule
 if (!(Get-NetFirewallRule -Name "ICMP Allow incoming V4 echo request" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
     Write-Output "Firewall Rule 'ICMP Allow incoming V4 echo request' does not exist, creating it..."

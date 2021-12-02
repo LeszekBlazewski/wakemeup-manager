@@ -88,6 +88,9 @@ export class NodesService {
     } catch (e) {
       newState.alive = false;
     }
+    this.logger.log(
+      `[Node ${state.host}] State check {alive: ${newState.alive}, os: ${newState.os}, actionPending: ${newState.actionPending}}`,
+    );
     return newState;
   }
 

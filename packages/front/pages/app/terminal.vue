@@ -47,6 +47,7 @@
 import {
   computed,
   defineComponent,
+  onMounted,
   ref,
   useContext,
   watch,
@@ -55,7 +56,6 @@ import { NodeState, OS } from '~/../api/dist/types'
 import { useTerminal } from '~/composables/useTerminal'
 import { useNavigationStore } from '~/store/navigationStore'
 import { useNodesStore } from '~/store/nodesStore'
-
 export default defineComponent({
   auth: true,
   middleware() {
@@ -66,9 +66,10 @@ export default defineComponent({
       host: '',
       name: 'Master',
       os: OS.UBUNTU,
+      username: 'lab',
     }
     const { runInTerminal, getSshCommand } = useTerminal()
-    const { states } = useNodesStore()
+    const nodesStore = useNodesStore()
     const { $axios, $auth, route } = useContext()
     const key = ref(0)
     const src = computed(() => {
@@ -76,35 +77,29 @@ export default defineComponent({
       return `${$axios.defaults.baseURL}wetty?token=${token?.substr(7)}`
     })
 
-    const selectedState = ref<Partial<NodeState> | null>(masterNode)
-
-    const stateItems = ref<Partial<NodeState>[]>([masterNode])
-    watch(
-      states,
-      () => {
-        stateItems.value = [
-          masterNode,
-          ...states.filter((s) => s.alive && !s.actionPending),
-        ]
-      },
-      { deep: true, immediate: true }
-    )
-    watch(
-      () => route.value.query.host,
-      () => {
-        selectedState.value =
-          states.find((s) => s.host === route.value.query?.host || '') ||
-          masterNode
-      },
-      { deep: true, immediate: true }
-    )
-
-    watch(selectedState, () => {
-      observer.disconnect()
-      key.value++
+    const selectedState = computed<Partial<NodeState>>(() => {
+      return (
+        nodesStore.states.find(
+          (s) => s.host === route.value.query?.host || ''
+        ) || masterNode
+      )
     })
 
-    async function enterCommand() {
+    const stateItems = computed<Partial<NodeState>[]>(() => {
+      return [
+        masterNode,
+        ...nodesStore.states.filter((s) => s.alive && !s.actionPending),
+      ]
+    })
+
+    watch(selectedState, (n, o) => {
+      if (n.host !== o.host) {
+        textareaObserver.disconnect()
+        key.value++
+      }
+    })
+
+    function enterCommand() {
       if (selectedState.value) {
         const iframe = refs.iframe as HTMLIFrameElement
         const command = getSshCommand(selectedState.value as NodeState)
@@ -124,24 +119,36 @@ export default defineComponent({
       }
     }
 
-    let observer: MutationObserver
+    let textareaObserver: MutationObserver
+    let iframeObserver: MutationObserver
     if (process.client) {
-      observer = new MutationObserver((changes) => {
+      textareaObserver = new MutationObserver((changes) => {
         if (selectedState.value?.host)
           for (const c of changes) {
             if (!(c.target as HTMLElement).style.left.startsWith('0')) {
               enterCommand()
-              observer.disconnect()
+              textareaObserver.disconnect()
               break
             }
           }
       })
+      iframeObserver = new MutationObserver((change) => {
+        const iframe = refs.iframe as HTMLIFrameElement
+        const textarea = iframe?.contentDocument?.querySelector(
+          '.xterm-helper-textarea'
+        )
+        if (textarea) {
+          textareaObserver.observe(textarea, { attributes: true })
+          iframeObserver.disconnect()
+        }
+      })
     }
+
+    onMounted(() => {})
 
     return {
       OS,
       src,
-      states,
       key,
       selectedState,
       runInTerminal,
@@ -151,11 +158,18 @@ export default defineComponent({
       },
       onLoad() {
         const iframe = refs.iframe as HTMLIFrameElement
-        const textarea = iframe?.contentDocument?.querySelector(
-          '.xterm-helper-textarea'
-        )
-        if (textarea && observer) {
-          observer.observe(textarea, { attributes: true })
+        if (iframe.contentDocument) {
+          const textarea = iframe?.contentDocument?.querySelector(
+            '.xterm-helper-textarea'
+          )
+          if (textarea) {
+            textareaObserver.observe(textarea, { attributes: true })
+          } else {
+            iframeObserver.observe(iframe.contentDocument.body, {
+              subtree: true,
+              childList: true,
+            })
+          }
         }
       },
     }

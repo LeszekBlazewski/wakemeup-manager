@@ -100,15 +100,19 @@ export class NodesService {
       username: state.username,
       identity: this.configService.createPrivateKeyPath(),
     } as unknown);
+
+    let afterState: NodeState;
     try {
+      this.logger.log(`[Node ${state.host}] Opening SSH connection`);
       await ssh.connect();
+      this.logger.log(`[Node ${state.host}] SSH connection opened`);
+
       if (state.os === OS.UBUNTU) await ssh.exec('sudo', ['shutdown', 'now']);
       else await ssh.exec('shutdown', ['-s', '-t', '0']);
       this.logger.log(`[Node ${state.host}] Shutdown requested`);
       ssh.close();
 
       /** Wait for shutdown */
-      let afterState: NodeState;
       let waitPeriods = this.waitShutdownPeriods;
       do {
         await wait(1000);
@@ -122,7 +126,10 @@ export class NodesService {
 
       return afterState;
     } catch (e) {
-      return state;
+      this.logger.error(`[Node ${state.host}] Shutdown error`);
+      this.logger.error(e);
+
+      return afterState || state;
     }
   }
 

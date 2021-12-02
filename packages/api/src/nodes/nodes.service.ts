@@ -150,7 +150,7 @@ export class NodesService {
     let afterState: NodeState;
     let waitPeriods = this.waitBootPeriods;
     do {
-      this.wake(state.mac);
+      await this.wake(state.mac);
       await wait(1000);
       afterState = await this.checkState(state);
       this.setState(afterState);

@@ -157,7 +157,7 @@ export class NodesService {
     return afterState;
   }
 
-  private async getUsername(state: NodeState) {
+  private getUsername(state: NodeState) {
     return state.os === OS.UBUNTU ? state.username : state.usernameWindows;
   }
 

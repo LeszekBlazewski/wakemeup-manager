@@ -167,14 +167,18 @@ export class NodesService {
   }
 
   private async wake(mac: string) {
-    await firstValueFrom(
-      this.httpService.post(`${this.bootOptions.wolAgentUrl}/wake`, {
-        wake_token: this.jwtService.sign(
-          { mac },
-          { expiresIn: '1s', secret: this.bootOptions.wolAgentSecret },
-        ),
-      }),
-    );
+    try {
+      await firstValueFrom(
+        this.httpService.post(`${this.bootOptions.wolAgentUrl}/wake`, {
+          wake_token: this.jwtService.sign(
+            { mac },
+            { expiresIn: '1s', secret: this.bootOptions.wolAgentSecret },
+          ),
+        }),
+      );
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   private getUsername(state: NodeState) {

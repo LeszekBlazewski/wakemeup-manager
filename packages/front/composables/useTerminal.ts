@@ -7,11 +7,17 @@ export function useTerminal() {
   const router = useRouter()
 
   function getSshCommand(state: NodeState) {
-    if (state.os === OS.UBUNTU)
-      return `clear; ssh ${state.username}@${state.host}`
-    else
-      return `clear; ssh ${state.usernameWindows}@${state.host}`
+    const username = state.os === OS.UBUNTU ? state.username : state.usernameWindows
+
+    if (username)
+      return `clear; ssh ${username}@${state.host}`
+    else {
+      const err = `No username found for OS: ${state.os}`
+      show(err)
+      throw new Error(err)
+    }
   }
+
   async function runInTerminal(state: NodeState) {
     router.push('/app/terminal?host=' + state.host)
 
@@ -19,8 +25,9 @@ export function useTerminal() {
     const result = await navigator.permissions.query(queryOpts as PermissionDescriptor);
     if (result.state === 'granted') {
       await navigator.clipboard.writeText(getSshCommand(state))
-      show('SSH command was copied to clipboard just in case!')
+      show('SSH command copied to clipboard just in case')
     }
   }
+
   return { runInTerminal, getSshCommand }
 }

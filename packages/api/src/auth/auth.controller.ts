@@ -36,7 +36,7 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(JwtRefreshAuthGuard)
   @ApiBearerAuth()
-  async refresh(@Token() token: string, @AuthUser() user: User) {
+  async refresh(@Body('refresh_token') token: string, @AuthUser() user: User) {
     return await this.service.refresh(token, user);
   }
 

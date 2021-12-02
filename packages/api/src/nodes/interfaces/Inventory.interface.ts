@@ -3,7 +3,7 @@ export type AnsibleHost = string;
 interface Host {
   ansible_host: AnsibleHost;
   mac_address: string;
-  name: string;
+  name?: string;
   username: string;
   username_windows: string;
 }

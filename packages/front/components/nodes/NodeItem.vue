@@ -35,7 +35,7 @@
     </v-tooltip>
     <v-list-item-content>
       <v-list-item-title>
-        <b>{{ state.name }} ·</b> {{ state.host }}
+        <b>{{ state.name }} · {{ state.fqdn }} ·</b> {{ state.host }}
       </v-list-item-title>
       <v-list-item-subtitle>
         <v-icon v-if="state.alive && state.os === OS.UBUNTU">

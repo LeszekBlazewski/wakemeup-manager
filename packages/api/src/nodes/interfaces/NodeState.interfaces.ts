@@ -4,13 +4,21 @@ export enum OS {
 }
 
 export interface NodeState {
+  // Time
   timestamp: number;
+
+  // Identity
   mac: string;
   host: string;
+  fqdn: string;
+  name?: string;
+
+  // State
   alive: boolean;
   os: OS;
-  name: string;
+  actionPending: boolean;
+
+  // Credentials
   username: string;
   usernameWindows: string;
-  actionPending: boolean;
 }

@@ -15,7 +15,8 @@ export class NodesService {
   private states = new Map<AnsibleHost, NodeState>();
   private bootTargets = new Map<AnsibleHost, OS>();
   private logger = new Logger(NodesService.name);
-  readonly waitPeriods = 60;
+  readonly waitShutdownPeriods = 60;
+  readonly waitBootPeriods = 30;
 
   constructor(private configService: ConfigService) {
     this.initStates();
@@ -39,18 +40,22 @@ export class NodesService {
     const inventory = readFileSync(p, { encoding: 'utf-8' });
     const parsed = yaml.parse(inventory) as Inventory;
 
-    Object.values(parsed.kubernetes.children.worker.hosts || {}).forEach(
-      (host) => {
+    Object.entries(parsed.kubernetes.children.worker.hosts || {}).forEach(
+      ([fqdn, host]) => {
         const state: NodeState = {
-          host: host.ansible_host,
+          timestamp: new Date().getTime(),
+
           mac: host.mac_address,
+          host: host.ansible_host,
+          fqdn,
+          name: host.name,
+
           alive: false,
           os: OS.WINDOWS,
-          name: host.name,
+          actionPending: false,
+
           username: host.username,
           usernameWindows: host.username_windows,
-          timestamp: new Date().getTime(),
-          actionPending: false,
         };
         this.setState(state);
         this.bootTargets.set(state.host, OS.WINDOWS);
@@ -101,7 +106,7 @@ export class NodesService {
 
       /** Wait for shutdown */
       let afterState: NodeState;
-      let waitPeriods = this.waitPeriods;
+      let waitPeriods = this.waitShutdownPeriods;
       do {
         await wait(1000);
         afterState = await this.checkState(state);
@@ -110,7 +115,7 @@ export class NodesService {
       } while (waitPeriods-- > 0 && afterState.alive);
 
       if (waitPeriods >= 0) this.logger.log(`[Node ${state.host}] Shutdown`);
-      else this.logger.log(`[Node ${state.host}] Shutdown timeout`);
+      else this.logger.error(`[Node ${state.host}] Shutdown timeout`);
 
       return afterState;
     } catch (e) {
@@ -124,7 +129,7 @@ export class NodesService {
 
     /** Wait for boot */
     let afterState: NodeState;
-    let waitPeriods = this.waitPeriods;
+    let waitPeriods = this.waitBootPeriods;
     do {
       wol.wake(state.mac);
       await wait(1000);
@@ -137,7 +142,7 @@ export class NodesService {
     this.bootTargets.set(state.host, OS.WINDOWS);
     if (waitPeriods >= 0)
       this.logger.log(`[Node ${state.host}] Booted with: ${afterState.os}`);
-    else this.logger.log(`[Node ${state.host}] Boot timeout`);
+    else this.logger.error(`[Node ${state.host}] Boot timeout`);
 
     return afterState;
   }

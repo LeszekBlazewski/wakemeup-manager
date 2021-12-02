@@ -31,7 +31,7 @@ services:
       - WOL_AGENT_URL=${WOL_AGENT_URL:-http://wol-agent:3003}
       - WOL_AGENT_SECRET=${SECRET:-wolSecret}
       - GRUB_WINDOWS=${GRUB_WINDOWS:-3}
-      - WETTY_TARGET_URL=http://wetty:3001/
+      - WETTY_TARGET_URL=http://wetty:3001
       - WETTY_PROXY_URL=/api/wetty
     volumes:
       - ./config:/app/config:ro

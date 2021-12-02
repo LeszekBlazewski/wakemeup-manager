@@ -51,7 +51,6 @@ services:
 
   wetty:
     image: wettyoss/wetty
-    network_mode: host # needed for api communication
     command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
       --ssh-host ${SSH_HOST:-192.168.0.141} --ssh-key
       ${SSH_PRIVATE_KEY:-/app/config/lab229} --ssh-auth publickey,password"

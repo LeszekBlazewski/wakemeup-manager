@@ -8,7 +8,10 @@ import execa from 'execa';
 import SSH2Promise from 'ssh2-promise';
 import wait from 'wait';
 import TFTP from 'tftp';
-import wol from 'wol';
+import { HttpService } from '@nestjs/axios';
+import { BootOptions } from 'src/config/interfaces/boot-options.interface';
+import { JwtService } from '@nestjs/jwt';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class NodesService {
@@ -17,9 +20,15 @@ export class NodesService {
   private logger = new Logger(NodesService.name);
   readonly waitShutdownPeriods = 60;
   readonly waitBootPeriods = 30;
+  readonly bootOptions: BootOptions;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private httpService: HttpService,
+    private jwtService: JwtService,
+  ) {
     this.initStates();
+    this.bootOptions = configService.createBootOptions();
 
     const tftp = TFTP.createServer(
       {
@@ -141,7 +150,7 @@ export class NodesService {
     let afterState: NodeState;
     let waitPeriods = this.waitBootPeriods;
     do {
-      wol.wake(state.mac);
+      this.wake(state.mac);
       await wait(1000);
       afterState = await this.checkState(state);
       this.setState(afterState);
@@ -155,6 +164,17 @@ export class NodesService {
     else this.logger.error(`[Node ${state.host}] Boot timeout`);
 
     return afterState;
+  }
+
+  private async wake(mac: string) {
+    await firstValueFrom(
+      this.httpService.post(`${this.bootOptions.wolAgentUrl}/wake`, {
+        wake_token: this.jwtService.sign(
+          { mac },
+          { expiresIn: '1s', secret: this.bootOptions.wolAgentSecret },
+        ),
+      }),
+    );
   }
 
   private getUsername(state: NodeState) {

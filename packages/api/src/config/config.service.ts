@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
 import { resolve } from 'path';
 import { OS } from 'src/types';
+import { BootOptions } from './interfaces/boot-options.interface';
 
 @Injectable()
 export class ConfigService implements JwtOptionsFactory {
@@ -61,9 +62,10 @@ export class ConfigService implements JwtOptionsFactory {
     };
   }
 
-  /** GRUB boot option index  */
-  public createBootOptions() {
+  public createBootOptions(): BootOptions {
     return {
+      wolAgentUrl: process.env.WOL_AGENT_URL || 'http://localhost:3003',
+      wolAgentSecret: process.env.WOL_AGENT_SECRET || 'wolSecret',
       [OS.UBUNTU]: +process.env.GRUB_UBUNTU || 0,
       [OS.WINDOWS]: +process.env.GRUB_WINDOWS || 3,
     };

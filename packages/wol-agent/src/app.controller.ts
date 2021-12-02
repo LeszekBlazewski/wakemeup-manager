@@ -31,7 +31,7 @@ export class AppController {
       if (errors.length) throw new BadRequestException(errors);
 
       wol.wake(payload.mac);
-      this.logger.log(`Woken ${payload.mac}`);
+      this.logger.log(`Waking ${payload.mac}`);
     } catch (e) {
       if (e instanceof JsonWebTokenError) {
         this.logger.error(e);

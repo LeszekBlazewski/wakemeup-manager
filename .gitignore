@@ -4,3 +4,5 @@ node_modules
 config/inventory.yml
 config/lab229
 config/id_ed25519
+
+*.log

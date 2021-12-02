@@ -97,7 +97,7 @@ export class NodesService {
   public async shutdown(state: NodeState) {
     const ssh = new SSH2Promise({
       host: state.host,
-      username: state.username,
+      username: this.getUsername(state),
       identity: this.configService.createPrivateKeyPath(),
     } as unknown);
 
@@ -155,6 +155,10 @@ export class NodesService {
     else this.logger.error(`[Node ${state.host}] Boot timeout`);
 
     return afterState;
+  }
+
+  private async getUsername(state: NodeState) {
+    return state.os === OS.UBUNTU ? state.username : state.usernameWindows;
   }
 
   private handleTFTP(req, res) {

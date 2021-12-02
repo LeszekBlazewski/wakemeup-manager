@@ -95,7 +95,12 @@ export default {
     }
   },
 
-  // Build Configuration: https://go.nuxtjs.dev/config-buildprocess.env.BASE_URL ? `${process.env.BASE_URL}/` : 'http://mgu.localhost/'
+  // Build Configuration: https://go.nuxtjs.dev/config-build
+  build: {
+    parallel: true
+  },
+
+  auth: {
     redirect: {
       login: '/',
       logout: '/',

@@ -99,6 +99,7 @@ export class NodesService {
         newState.os = OS.UBUNTU;
         await ssh.close();
       } catch (e) {
+        this.logger.error(e);
         // If fails with ssh error (level in object) then it's dead
         if ('level' in e) newState.alive = false;
         // If fails with other error (/proc/loadavg not found) then it's windows

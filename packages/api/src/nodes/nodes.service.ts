@@ -99,13 +99,15 @@ export class NodesService {
         newState.os = OS.UBUNTU;
         await ssh.close();
       } catch (e) {
-        this.logger.error(e);
         // If fails with ssh error (level in object) then it's dead
-        if ('level' in e) newState.alive = false;
+        if ('level' in e) {
+          newState.alive = false;
+          // Check next username
+          continue;
+        }
         // If fails with other error (/proc/loadavg not found) then it's windows
         else newState.os = OS.WINDOWS;
       }
-      break;
     }
     this.logger.log(
       `[Node ${state.host}] State check {alive: ${newState.alive}, os: ${newState.os}, actionPending: ${newState.actionPending}}`,

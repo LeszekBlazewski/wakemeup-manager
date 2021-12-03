@@ -89,7 +89,7 @@ export class NodesService {
     const newState = { ...state };
     newState.timestamp = new Date().getTime();
     try {
-      const { stdout } = await execa('ping', ['-c1', state.host, '-w', '1']);
+      const { stdout } = await execa('ping', ['-c1', '-W1', '-w1', state.host]);
       const ttlRegexp = /\sttl=(\d+)\s/gm;
       const ttl = +ttlRegexp.exec(stdout)[1];
       newState.os = ttl <= 64 ? OS.UBUNTU : OS.WINDOWS;
@@ -119,7 +119,7 @@ export class NodesService {
       if (state.os === OS.UBUNTU) await ssh.exec('sudo', ['shutdown', 'now']);
       else await ssh.exec('shutdown', ['-s', '-t', '0']);
       this.logger.log(`[Node ${state.host}] Shutdown requested`);
-      ssh.close();
+      await ssh.close();
 
       /** Wait for shutdown */
       let waitPeriods = this.waitShutdownPeriods;

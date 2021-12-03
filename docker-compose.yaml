@@ -3,6 +3,7 @@ version: "3.9"
 services:
   proxy:
     image: nginx:1.21.4-alpine
+    restart: unless-stopped
     volumes:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -39,6 +40,7 @@ services:
   wol-agent:
     build: .
     command: npx lerna run --scope wol-agent --stream start:prod
+    restart: unless-stopped
     network_mode: host
     environment:
       - SECRET=${SECRET:-wolSecret}
@@ -46,6 +48,7 @@ services:
   front:
     build: .
     command: npx lerna run --scope front --stream start
+    restart: unless-stopped
     environment:
       - BASE_URL=${BASE_URL:-http://mgu.localhost}
 
@@ -54,5 +57,6 @@ services:
     command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
       --ssh-host ${SSH_HOST:-192.168.0.141} --ssh-key
       ${SSH_PRIVATE_KEY:-/app/config/lab229} --ssh-auth publickey,password"
+    restart: unless-stopped
     volumes:
       - ./config:/app/config:ro

@@ -36,7 +36,6 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "execa": "^5.0.0",
     "http-proxy-middleware": "^2.0.1",
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.13",

@@ -46,6 +46,10 @@
         </v-icon>
         <span v-if="state.alive"> Alive </span>
         <span v-else> Dead </span>
+        ·
+        <template v-if="state.os === OS.UBUNTU">
+          Load: {{ state.loadAvg }}
+        </template>
       </v-list-item-subtitle>
     </v-list-item-content>
     <v-list-item-action>

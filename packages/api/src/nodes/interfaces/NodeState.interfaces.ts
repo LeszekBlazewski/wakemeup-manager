@@ -16,6 +16,7 @@ export interface NodeState {
   // State
   alive: boolean;
   os: OS;
+  loadAvg: string;
   actionPending: boolean;
 
   // Credentials

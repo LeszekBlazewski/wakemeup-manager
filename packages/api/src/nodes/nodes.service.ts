@@ -4,7 +4,6 @@ import { ConfigService } from 'src/config/config.service';
 import { NodeState, OS } from './interfaces/NodeState.interfaces';
 import * as yaml from 'yaml';
 import { Inventory, AnsibleHost } from './interfaces/Inventory.interface';
-import execa from 'execa';
 import SSH2Promise from 'ssh2-promise';
 import wait from 'wait';
 import TFTP from 'tftp';
@@ -61,6 +60,7 @@ export class NodesService {
 
           alive: false,
           os: OS.WINDOWS,
+          loadAvg: '0.00 0.00 0.00',
           actionPending: false,
 
           username: host.username,
@@ -88,14 +88,23 @@ export class NodesService {
   public async checkState(state: NodeState) {
     const newState = { ...state };
     newState.timestamp = new Date().getTime();
-    try {
-      const { stdout } = await execa('ping', ['-c1', '-W1', '-w1', state.host]);
-      const ttlRegexp = /\sttl=(\d+)\s/gm;
-      const ttl = +ttlRegexp.exec(stdout)[1];
-      newState.os = ttl <= 64 ? OS.UBUNTU : OS.WINDOWS;
-      newState.alive = true;
-    } catch (e) {
-      newState.alive = false;
+    // Check every user starting with ubuntu
+    for (const username of [state.username, state.usernameWindows]) {
+      const ssh = this.getSSHConnection(state, username);
+      try {
+        newState.alive = true;
+        // If this command works then it's ubuntu
+        const loadAvg: string = await ssh.exec('cat', ['/proc/loadavg']);
+        newState.loadAvg = loadAvg.substr(0, 14);
+        newState.os = OS.UBUNTU;
+        await ssh.close();
+      } catch (e) {
+        // If fails with ssh error (level in object) then it's dead
+        if ('level' in e) newState.alive = false;
+        // If fails with other error (/proc/loadavg not found) then it's windows
+        else newState.os = OS.WINDOWS;
+      }
+      break;
     }
     this.logger.log(
       `[Node ${state.host}] State check {alive: ${newState.alive}, os: ${newState.os}, actionPending: ${newState.actionPending}}`,
@@ -104,12 +113,7 @@ export class NodesService {
   }
 
   public async shutdown(state: NodeState) {
-    const ssh = new SSH2Promise({
-      host: state.host,
-      username: this.getUsername(state),
-      identity: this.configService.createPrivateKeyPath(),
-    } as unknown);
-
+    const ssh = this.getSSHConnection(state);
     let afterState: NodeState;
     try {
       this.logger.log(`[Node ${state.host}] Opening SSH connection`);
@@ -183,6 +187,18 @@ export class NodesService {
 
   private getUsername(state: NodeState) {
     return state.os === OS.UBUNTU ? state.username : state.usernameWindows;
+  }
+
+  private getSSHConnection(state: NodeState, username?: string) {
+    return new SSH2Promise({
+      host: state.host,
+      username: username || this.getUsername(state),
+      identity: this.configService.createPrivateKeyPath(),
+      readyTimeout: 1000,
+      reconnect: false,
+      reconnectDelay: 0,
+      reconnectTries: 0,
+    } as unknown);
   }
 
   private handleTFTP(req, res) {

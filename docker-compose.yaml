@@ -4,6 +4,9 @@ services:
   proxy:
     image: nginx:1.21.4-alpine
     restart: unless-stopped
+    depends_on:
+      - api
+      - front
     volumes:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -12,6 +15,10 @@ services:
   api:
     build: .
     command: npx lerna run --scope api --stream start:prod
+    restart: unless-stopped
+    depends_on:
+      - wol-agent
+      - wetty
     extra_hosts:
       - "wol-agent:172.17.0.1"
     ports:
@@ -34,6 +41,7 @@ services:
       - GRUB_WINDOWS=${GRUB_WINDOWS:-3}
       - WETTY_TARGET_URL=http://wetty:3001
       - WETTY_PROXY_URL=/api/wetty
+      - LOG_VERBOSITY=${LOG_VERBOSITY:-4}
     volumes:
       - ./config:/app/config:ro
 

@@ -112,7 +112,7 @@ export class NodesService {
         }
       }
     }
-    this.logger.log(
+    this.logger.verbose(
       `[Node ${state.host}] State check {alive: ${newState.alive}, os: ${newState.os}, actionPending: ${newState.actionPending}}`,
     );
     return newState;

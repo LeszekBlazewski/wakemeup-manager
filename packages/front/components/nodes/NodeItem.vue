@@ -65,6 +65,17 @@
           <v-icon> mdi-console-line </v-icon>
         </v-btn>
         <v-btn
+          v-if="state.alive && state.os === OS.UBUNTU"
+          title="Generate wake-up token"
+          fab
+          small
+          color="primary"
+          class="ml-2"
+          @click="tokenFormVisible = true"
+        >
+          <v-icon> mdi-key-plus </v-icon>
+        </v-btn>
+        <v-btn
           v-if="state.alive"
           title="Shutdown"
           fab
@@ -97,16 +108,25 @@
         >
           <v-icon> mdi-ubuntu </v-icon>
         </v-btn>
+        <token-dialog v-model="tokenFormVisible" :state="state" />
       </v-row>
     </v-list-item-action>
   </v-list-item>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  PropType,
+  ref,
+  watch,
+} from '@nuxtjs/composition-api'
 import { NodeState, OS } from 'api'
 import { DateTime } from 'luxon'
+import TokenDialog from './TokenDialog.vue'
 export default defineComponent({
+  components: { TokenDialog },
   props: {
     state: {
       type: Object as PropType<NodeState>,
@@ -119,8 +139,17 @@ export default defineComponent({
   },
   emits: ['select', 'shutdown', 'boot', 'terminal'],
   setup(props) {
+    const tokenFormVisible = ref(false)
+    watch(
+      () => props.state,
+      (state: NodeState) => {
+        if (!state.alive || state.os !== OS.UBUNTU)
+          tokenFormVisible.value = false
+      }
+    )
     return {
       OS,
+      tokenFormVisible,
       last: computed(() => {
         return DateTime.fromMillis(props.state.timestamp).toLocaleString(
           DateTime.DATETIME_MED_WITH_SECONDS

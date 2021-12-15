@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtQueryStrategy } from './jwt-query.strategy';
 import { JwtRefreshStrategy } from './jwt-refresh.strategy';
+import { JwtBootStrategy } from './jwt-boot.strategy';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
@@ -19,7 +20,13 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtRefreshStrategy, JwtStrategy, JwtQueryStrategy],
+  providers: [
+    AuthService,
+    JwtRefreshStrategy,
+    JwtStrategy,
+    JwtQueryStrategy,
+    JwtBootStrategy,
+  ],
   exports: [AuthService, JwtQueryStrategy],
 })
 export class AuthModule {}

@@ -11,6 +11,8 @@ import { HttpService } from '@nestjs/axios';
 import { BootOptions } from 'src/config/interfaces/boot-options.interface';
 import { JwtService } from '@nestjs/jwt';
 import { firstValueFrom } from 'rxjs';
+import { BootTokenCreateDto } from './dto/boot-token-create.dto';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class NodesService {
@@ -20,6 +22,7 @@ export class NodesService {
   readonly waitShutdownPeriods = 60;
   readonly waitBootPeriods = 30;
   readonly bootOptions: BootOptions;
+  readonly studentUsername: string;
 
   constructor(
     private configService: ConfigService,
@@ -28,6 +31,7 @@ export class NodesService {
   ) {
     this.initStates();
     this.bootOptions = configService.createBootOptions();
+    this.studentUsername = configService.createStudentOptions().username;
 
     const tftp = TFTP.createServer(
       {
@@ -174,6 +178,40 @@ export class NodesService {
     else this.logger.error(`[Node ${state.host}] Boot timeout`);
 
     return afterState;
+  }
+
+  public async generateBootToken(options: BootTokenCreateDto): Promise<string> {
+    return this.jwtService.sign(
+      {
+        host: options.host,
+        os: options.os,
+      },
+      {
+        expiresIn:
+          DateTime.fromISO(options.expiresAt)
+            .startOf('day')
+            .diffNow()
+            .as('seconds') + 's',
+        secret: this.bootOptions.bootTokenSecret,
+      },
+    );
+  }
+
+  public async changePassword(
+    state: NodeState,
+    password: string,
+  ): Promise<void> {
+    const ssh = this.getSSHConnection(state);
+    this.logger.log(`[Node ${state.host}] Opening SSH connection`);
+    await ssh.connect();
+    this.logger.log(`[Node ${state.host}] SSH connection opened`);
+
+    if (state.os === OS.UBUNTU)
+      await ssh.exec(
+        `echo ${this.studentUsername}:${password} | sudo chpasswd`,
+      );
+    this.logger.log(`[Node ${state.host}] Student password changed`);
+    await ssh.close();
   }
 
   private async wake(mac: string) {

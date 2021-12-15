@@ -82,7 +82,7 @@ export class NodesGateway {
     });
   }
 
-  private async wrapAction(
+  public async wrapAction(
     state: NodeState,
     action: (state: NodeState) => Promise<NodeState>,
   ) {

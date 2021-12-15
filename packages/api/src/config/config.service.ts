@@ -62,10 +62,17 @@ export class ConfigService implements JwtOptionsFactory {
     };
   }
 
+  public createStudentOptions() {
+    return {
+      username: process.env.STUDENT_USERNAME || 'student',
+    };
+  }
+
   public createBootOptions(): BootOptions {
     return {
       wolAgentUrl: process.env.WOL_AGENT_URL || 'http://localhost:3003',
       wolAgentSecret: process.env.WOL_AGENT_SECRET || 'wolSecret',
+      bootTokenSecret: process.env.BOOT_TOKEN_SECRET || 'bootSecret',
       [OS.UBUNTU]: +process.env.GRUB_UBUNTU || 0,
       [OS.WINDOWS]: +process.env.GRUB_WINDOWS || 3,
     };

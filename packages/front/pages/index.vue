@@ -97,7 +97,6 @@
 
 <script lang="ts">
 import { useVuelidate } from '@vuelidate/core'
-import { AxiosError } from 'axios'
 import { required } from '@vuelidate/validators'
 import {
   defineComponent,

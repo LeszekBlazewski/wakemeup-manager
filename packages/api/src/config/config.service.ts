@@ -3,7 +3,6 @@ import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
 import { resolve } from 'path';
 import { OS } from 'src/types';
 import { BootOptions } from './interfaces/boot-options.interface';
-
 @Injectable()
 export class ConfigService implements JwtOptionsFactory {
   public createUserData() {

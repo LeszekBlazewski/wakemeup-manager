@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -61,5 +68,18 @@ export class NodesController {
     this.nodesGateway.wrapAction(state, (state) => {
       return this.nodesService.boot(state, payload.os || OS.UBUNTU);
     });
+  }
+
+  @UseGuards(JwtBootAuthGuard)
+  @Post('boot/state')
+  public async stateByToken(@Body() bootDto: BootTokenDto) {
+    try {
+      const payload = this.jwtService.decode(
+        bootDto.boot_token,
+      ) as Partial<NodeState>;
+      return this.nodesService.getState(payload.host);
+    } catch (e) {
+      throw new NotFoundException();
+    }
   }
 }

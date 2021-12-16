@@ -6,10 +6,10 @@
     @input="(v) => $emit('input', v)"
   >
     <v-card :loading="loading">
-      <v-card-title>Generate wake-up token</v-card-title>
+      <v-card-title>Generate boot token</v-card-title>
       <template v-if="!token">
         <v-card-text>
-          This utility will generate wake-up token to boot
+          This utility will generate boot token to boot
           <b>{{ state.name }} [{{ state.host }}]</b> with chosen OS. It is
           possible to change the student's account password alongside this
           process.
@@ -81,10 +81,12 @@
       <template v-else>
         <v-card-text>
           <v-textarea
+            outlined
             readonly
             rows="8"
             label="Token message"
             :value="tokenMessage"
+            hide-details
           />
         </v-card-text>
         <v-card-actions>
@@ -187,11 +189,11 @@ export default defineComponent({
           if (result.state === 'granted') {
             await nextTick()
             await navigator.clipboard.writeText(token.value)
-            show('Wake-up token copied to clipboard')
+            show('Boot token copied to clipboard')
           }
 
           tokenMessage.value = ''
-          tokenMessage.value += `A new token was generated on ${DateTime.now().toLocaleString(
+          tokenMessage.value += `A new boot token was generated on ${DateTime.now().toLocaleString(
             DateTime.DATETIME_SHORT_WITH_SECONDS
           )}\n`
           tokenMessage.value += `Expires at: ${DateTime.fromISO(

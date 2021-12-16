@@ -66,7 +66,7 @@
         </v-btn>
         <v-btn
           v-if="state.alive && state.os === OS.UBUNTU"
-          title="Generate wake-up token"
+          title="Generate boot token"
           fab
           small
           color="primary"

@@ -27,18 +27,11 @@
           outlined
           label="Token"
           :rows="6"
-          hide-details
           :error-messages="$v.boot_token.$errors.map((e) => e.$message)"
           placeholder="Paste token here"
-          class="pb-4"
         />
         <v-expand-transition>
-          <v-row v-if="invalidToken && form.boot_token.length">
-            <v-col :cols="12"> Invalid or expired token! </v-col>
-          </v-row>
-        </v-expand-transition>
-        <v-expand-transition>
-          <v-row v-if="state" dense>
+          <v-row v-if="state && !invalidToken" dense>
             <v-col :cols="12">Expires at: {{ expiresAt }}</v-col>
             <v-col :cols="12">
               <b>{{ state.name }} · </b> {{ state.host }} ·
@@ -68,7 +61,6 @@
               :loading="loading"
               cy-data="login-button"
               color="primary"
-              :disabled="invalidToken"
               @click="submit"
             >
               Boot
@@ -82,9 +74,8 @@
 
 <script lang="ts">
 import { useVuelidate } from '@vuelidate/core'
-import { required } from '@vuelidate/validators'
+import { required, helpers } from '@vuelidate/validators'
 import {
-  computed,
   defineComponent,
   onMounted,
   onUnmounted,
@@ -110,26 +101,43 @@ export default defineComponent({
     const loading = ref(false)
     const alertVisible = ref(false)
     const alertText = ref('')
-
-    const expiresAt = computed(() => {
-      try {
-        const payload = jwtDecode<{ exp: number }>(form.boot_token)
-        return DateTime.fromSeconds(payload.exp).toLocaleString(
-          DateTime.DATETIME_SHORT_WITH_SECONDS
-        )
-      } catch (e) {
-        //
-      }
-      return '---'
-    })
+    const invalidToken = ref(false)
+    const expiresAt = ref('---')
 
     const form = reactive({
       boot_token: '',
     })
 
-    const $v = useVuelidate({ boot_token: { required } }, form)
+    const $v = useVuelidate(
+      {
+        boot_token: {
+          required,
+          valid: helpers.withMessage(
+            'Invalid or expired token',
+            () => !invalidToken.value
+          ),
+        },
+      },
+      form
+    )
 
-    const invalidToken = ref(false)
+    watch(
+      () => form.boot_token,
+      (token) => {
+        try {
+          invalidToken.value = false
+          const payload = jwtDecode<{ exp: number }>(token)
+          expiresAt.value = DateTime.fromSeconds(payload.exp).toLocaleString(
+            DateTime.DATETIME_SHORT_WITH_SECONDS
+          )
+        } catch (e) {
+          invalidToken.value = true
+          expiresAt.value = '---'
+          $v.value.$touch()
+        }
+      }
+    )
+
     const state = ref<NodeState | null>(null)
     async function fetchState() {
       if (form.boot_token) {
@@ -145,6 +153,7 @@ export default defineComponent({
           state.value = null
           invalidToken.value = true
         }
+        $v.value.$touch()
       }
     }
     watch(() => form.boot_token, _.debounce(fetchState, 300))

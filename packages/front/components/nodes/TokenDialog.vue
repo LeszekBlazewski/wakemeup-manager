@@ -155,7 +155,10 @@ export default defineComponent({
     )
 
     watchEffect(() => {
-      if (form.os === OS.WINDOWS) form.changePassword = false
+      if (form.os === OS.WINDOWS) {
+        form.changePassword = false
+        form.password = ''
+      }
     })
 
     const tokenMessage = ref('')

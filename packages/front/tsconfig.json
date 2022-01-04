@@ -24,11 +24,10 @@
       ]
     },
     "types": [
+      "@nuxtjs/auth-next",
       "@nuxt/types",
       "@types/node",
-      "@types/pinia",
       "@nuxtjs/axios",
-      "@nuxtjs/auth-next",
       "@nuxtjs/vuetify",
       "nuxt-socket-io",
     ]

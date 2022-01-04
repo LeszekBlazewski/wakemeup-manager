@@ -58,6 +58,7 @@
               <v-checkbox
                 v-model="form.changePassword"
                 label="Change password"
+                :disabled="form.os === OS.WINDOWS"
               />
             </v-col>
             <v-col :cols="6">
@@ -66,7 +67,7 @@
                 prepend-icon="mdi-lock"
                 label="New student's password"
                 type="password"
-                :disabled="!form.changePassword"
+                :disabled="!form.changePassword || form.os === OS.WINDOWS"
                 :error-messages="$v.password.$errors.map((e) => e.$message)"
               />
             </v-col>
@@ -106,13 +107,14 @@ import {
   reactive,
   ref,
   useContext,
+  watchEffect,
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { requiredIf, minLength } from '@vuelidate/validators'
 import { DateTime } from 'luxon'
 import _ from 'lodash'
-import DatePicker from '../form/DatePicker.vue'
 import { NodeState, OS } from '~/../api/dist/types'
+import DatePicker from '../form/DatePicker.vue'
 import { useSnackbarStore } from '~/store/snackbarStore'
 interface TokenResponse {
   // eslint-disable-next-line camelcase
@@ -151,6 +153,10 @@ export default defineComponent({
       },
       form
     )
+
+    watchEffect(() => {
+      if (form.os === OS.WINDOWS) form.changePassword = false
+    })
 
     const tokenMessage = ref('')
     return {
@@ -193,7 +199,7 @@ export default defineComponent({
           }
 
           tokenMessage.value = ''
-          tokenMessage.value += `A new boot token was generated on ${DateTime.now().toLocaleString(
+          tokenMessage.value += `A new boot token was generated at ${DateTime.now().toLocaleString(
             DateTime.DATETIME_SHORT_WITH_SECONDS
           )}\n`
           tokenMessage.value += `Expires at: ${DateTime.fromISO(

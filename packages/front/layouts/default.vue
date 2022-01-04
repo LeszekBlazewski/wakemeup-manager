@@ -68,11 +68,11 @@ import {
   useContext,
 } from '@nuxtjs/composition-api'
 import Vue from 'vue'
+import { NodeState } from 'api'
 import { useNavigationStore } from '@/store/navigationStore'
 import GlobalFooter from '~/components/layout/GlobalFooter.vue'
 import { useNodesStore } from '~/store/nodesStore'
 import { useSnackbarStore } from '~/store/snackbarStore'
-import { NodeState } from '~/../api/dist/types'
 export default defineComponent({
   components: { GlobalFooter },
   setup() {

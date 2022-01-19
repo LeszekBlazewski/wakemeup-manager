@@ -47,19 +47,19 @@ export default {
   ],
 
   axios: {
-    baseURL: `${process.env.BASE_URL || 'http://mgu.localhost'}/api/`,
+    baseURL: `${process.env.BASE_URL || 'http://localhost'}/api/`,
   },
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: `${process.env.BASE_URL || 'http://mgu.localhost'}/api/`
+      baseURL: `${process.env.BASE_URL || 'http://localhost'}/api/`
     },
     io: {  // will be available in this.$config.io (client-side)
       sockets: [
         {
           default: true,
           name: 'socket',
-          url: `${process.env.BASE_URL || 'http://mgu.localhost'}/`
+          url: `${process.env.BASE_URL || 'http://localhost'}/`
         }
       ]
     }
@@ -70,7 +70,7 @@ export default {
         {
           default: true,
           name: 'socket',
-          url: `${process.env.BASE_URL || 'http://mgu.localhost'}/`
+          url: `${process.env.BASE_URL || 'http://localhost'}/`
         }
       ]
     }

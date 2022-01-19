@@ -1,6 +1,7 @@
 # 1. Downloads and loads REG file containing all necessary options for enabling WoL 
 # 2. Configures windows to start SSH server
 # 3. Allows ICMP traffic
+# 4. Allows RDP connections
 # on windows 10 inside 229 lab.
 
 $config_folder_uri="https://raw.githubusercontent.com/LeszekBlazewski/lab-229-cluster/master/wol/windows"

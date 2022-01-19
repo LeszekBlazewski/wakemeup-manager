@@ -1,0 +1,20 @@
+---
+version: "3.9"
+
+services:
+  proxy:
+    image: linuxserver/swag:1.22.0
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Warsaw
+      - URL=${BASE_DOMAIN:-localhost}
+      - VALIDATION=http
+      - STAGING=false
+    volumes:
+      - ./config/default-ssl.conf:/config/nginx/site-confs/default
+    ports:
+      - 443:443
+      - 80:80

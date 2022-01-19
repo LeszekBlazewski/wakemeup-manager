@@ -10,7 +10,7 @@
       :order="0"
       :order-sm="1"
     >
-      <p class="text-subtitle">Lab 229 Cluster Manager</p>
+      <p class="text-subtitle">Wake me up Manager</p>
       <p class="text-h4 text-md-h3 mb-8 mt-n4">Sign in</p>
 
       <v-alert

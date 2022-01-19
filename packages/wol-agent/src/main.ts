@@ -7,7 +7,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .addBearerAuth()
-    .setTitle('Lab 229 Cluster Manager')
+    .setTitle('Wake me up Manager')
     .setVersion('1.0.0')
     .build();
 

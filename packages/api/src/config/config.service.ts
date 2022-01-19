@@ -9,7 +9,7 @@ export class ConfigService implements JwtOptionsFactory {
     return {
       username: process.env.AUTH_USERNAME || 'username',
       password: process.env.AUTH_PASSWORD || 'password',
-      name: 'Lab 229 Cluster Manager',
+      name: 'Wake me up Manager',
     };
   }
 

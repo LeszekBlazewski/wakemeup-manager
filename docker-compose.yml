@@ -23,18 +23,20 @@ services:
       - "wol-agent:172.17.0.1"
     ports:
       - 6969:6969/udp
+    expose:
+      - 3000
     environment:
-      - AUTH_USERNAME=${AUTH_USERNAME:-mgu-master}
+      - AUTH_USERNAME=${AUTH_USERNAME:-master}
       - AUTH_PASSWORD=${AUTH_PASSWORD:-password}
-      - ANSIBLE_INVENTORY=${ANSIBLE_INVENTORY:-/app/config/inventory.yml}
+      - HOSTS_LIST=${HOSTS_LIST:-/app/config/hosts.yml}
       - STUDENT_USERNAME=${STUDENT_USERNAME:-student}
       - SECRET=${SECRET:-secret}
       - EXPIRES_IN=${EXPIRES_IN:-1h}
-      - SECRET_REFRESH=${SECRET_REFRESH:-topsecret}
+      - SECRET_REFRESH=${SECRET_REFRESH:-secretRefresh}
       - REFRESH_EXPIRES_IN=${REFRESH_EXPIRES_IN:-1d}
       - REFRESH_REMEMBER_EXPIRES_IN=${REFRESH_REMEMBER_EXPIRES_IN:-7d}
-      - BOOT_TOKEN_SECRET=${BOOT_TOKEN_SECRET:-pwrodbierasmakzycia}
-      - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY:-/app/config/lab229}
+      - BOOT_TOKEN_SECRET=${BOOT_TOKEN_SECRET:-bootSecret}
+      - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY:-/app/config/ssh_key}
       - STATE_CHECK_INTERVAL=${STATE_CHECK_INTERVAL:-10}
       - TFTP_PORT=${TFTP_PORT:-6969}
       - GRUB_UBUNTU=${GRUB_UBUNTU:-0}
@@ -61,12 +63,16 @@ services:
     restart: unless-stopped
     environment:
       - BASE_URL=${BASE_URL:-http://localhost}
+    expose:
+      - 3002
 
   wetty:
     image: wettyoss/wetty
-    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER:-pi}
-      --ssh-host ${SSH_HOST:-192.168.0.141} --ssh-key
-      ${SSH_PRIVATE_KEY:-/app/config/lab229} --ssh-auth publickey,password"
+    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER}
+      --ssh-host ${SSH_HOST} --ssh-key
+      ${SSH_PRIVATE_KEY:-/app/config/ssh_key} --ssh-auth publickey,password"
     restart: unless-stopped
     volumes:
       - ./config:/app/config:ro
+    expose:
+      - 3001

@@ -14,12 +14,12 @@ export class ConfigService implements JwtOptionsFactory {
   }
 
   /**
-   * @returns absolute path to inventory yaml
+   * @returns absolute path to hosts yaml
    */
   public createInventoryPath() {
     return (
-      process.env.ANSIBLE_INVENTORY ||
-      resolve(__dirname, '../../../../config/inventory.yml')
+      process.env.HOSTS_LIST ||
+      resolve(__dirname, '../../../../config/hosts.yml')
     );
   }
 
@@ -33,9 +33,9 @@ export class ConfigService implements JwtOptionsFactory {
 
   public createSecretOptions() {
     return {
-      secret: process.env.SECRET || 'topSecret',
+      secret: process.env.SECRET || 'secret',
       secretExpiresIn: process.env.EXPIRES_IN || '1d',
-      secretRefresh: process.env.SECRET_REFRESH || 'topSecret0',
+      secretRefresh: process.env.SECRET_REFRESH || 'secretRefresh',
       secretRefreshExpiresIn: process.env.REFRESH_EXPIRES_IN || '1d',
       secretRefreshRememberExpiresIn:
         process.env.REFRESH_REMEMBER_EXPIRES_IN || '7d',

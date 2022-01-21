@@ -66,7 +66,7 @@ export default defineComponent({
       host: '',
       name: 'Master',
       os: OS.UBUNTU,
-      username: 'lab',
+      usernameLinux: 'master',
     }
     const { runInTerminal, getSshCommand } = useTerminal()
     const nodesStore = useNodesStore()

@@ -15,6 +15,7 @@
       </v-btn>
       <v-divider class="ml-2" vertical />
       <v-btn
+        v-if="store.states.some((s) => s.usernameWindows)"
         :disabled="
           !selectedStates.length || !selectedStates.some((s) => !s.alive)
         "
@@ -28,6 +29,7 @@
         <v-icon> mdi-microsoft-windows </v-icon>
       </v-btn>
       <v-btn
+        v-if="store.states.some((s) => s.usernameLinux)"
         :disabled="
           !selectedStates.length || !selectedStates.some((s) => !s.alive)
         "
@@ -68,7 +70,7 @@
         />
         <v-list-item v-if="!store.states.length">
           <v-list-item-content class="justify-center">
-            No hosts defined in the inventory
+            No hosts defined in the hosts list
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -85,7 +87,7 @@ import {
   useContext,
   watch,
 } from '@nuxtjs/composition-api'
-import { AnsibleHost, NodeState, OS } from 'api'
+import { HostIp, NodeState, OS } from 'api'
 import Vue from 'vue'
 import _ from 'lodash'
 import NodeItem from './NodeItem.vue'
@@ -100,7 +102,7 @@ export default defineComponent({
     const store = useNodesStore()
     const { show } = useSnackbarStore()
     const socket = inject<any>('socket', ref(null))
-    const selectedHosts = ref<AnsibleHost[]>([])
+    const selectedHosts = ref<HostIp[]>([])
     const selectedStates = computed<NodeState[]>(() =>
       store.states.filter((s) => selectedHosts.value.includes(s.host))
     )

@@ -4,7 +4,7 @@
 # 4. Allows RDP connections
 # on windows 10 inside 229 lab.
 
-$config_folder_uri="https://raw.githubusercontent.com/LeszekBlazewski/lab-229-cluster/master/wol/windows"
+$config_folder_uri="https://raw.githubusercontent.com/LeszekBlazewski/wakemeup-manager/master/wol/windows"
 
 # WoL setup
 $reg_file_name = "enableWol.reg"

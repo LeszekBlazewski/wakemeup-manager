@@ -35,7 +35,8 @@
     </v-tooltip>
     <v-list-item-content>
       <v-list-item-title>
-        <b>{{ state.name }} · {{ state.fqdn }} ·</b> {{ state.host }}
+        <b v-if="state.name">{{ state.name }} · </b><b>{{ state.fqdn }} ·</b>
+        {{ state.host }}
       </v-list-item-title>
       <v-list-item-subtitle>
         <v-icon v-if="state.alive && state.os === OS.UBUNTU">
@@ -87,7 +88,7 @@
           <v-icon> mdi-window-close </v-icon>
         </v-btn>
         <v-btn
-          v-if="!state.alive"
+          v-if="!state.alive && state.usernameWindows"
           title="Boot Windows"
           fab
           small
@@ -98,7 +99,7 @@
           <v-icon> mdi-microsoft-windows </v-icon>
         </v-btn>
         <v-btn
-          v-if="!state.alive"
+          v-if="!state.alive && state.usernameLinux"
           title="Boot Ubuntu"
           fab
           small

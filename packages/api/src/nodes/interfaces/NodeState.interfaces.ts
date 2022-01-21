@@ -20,6 +20,6 @@ export interface NodeState {
   actionPending: boolean;
 
   // Credentials
-  username: string;
-  usernameWindows: string;
+  usernameLinux?: string;
+  usernameWindows?: string;
 }

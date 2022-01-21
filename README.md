@@ -1,6 +1,4 @@
-# Lab 229 - Cluster Manager
-
-**All commands below are relative to `<repo>/manager` location.**
+# Welcome to Wake me up Manager!
 
 ### Building Dockerfile
 

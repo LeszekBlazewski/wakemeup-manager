@@ -1,0 +1,19 @@
+---
+hosts:
+  machine1.mydomain.com:
+    ip: 207.159.35.67
+    mac_address: B5-BE-D6-34-57-F0
+    name: Node 01 RPi
+    username_linux: username_pi
+
+  machine2.mydomain.com:
+    ip: 192.168.0.161
+    mac_address: B5-BE-D6-34-57-F1
+    name: Node 02 PC
+    username_linux: user_linux
+    username_windows: user_windows
+
+  no-dns-name:
+    ip: 192.168.0.162
+    mac_address: B5-BE-D6-34-57-F2
+    username_windows: username_windows

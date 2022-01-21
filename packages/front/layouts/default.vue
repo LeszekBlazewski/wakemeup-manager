@@ -7,8 +7,8 @@
             <v-icon>mdi-account</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title> Lab 229 </v-list-item-title>
-            <v-list-item-subtitle> Cluster Manager </v-list-item-subtitle>
+            <v-list-item-title> {{ user.username }} </v-list-item-title>
+            <v-list-item-subtitle> Wake me up Manager </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 

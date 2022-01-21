@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { ConfigService } from 'src/config/config.service';
 import { NodeState, OS } from './interfaces/NodeState.interfaces';
 import * as yaml from 'yaml';
-import { Inventory, AnsibleHost } from './interfaces/Inventory.interface';
+import { HostList, HostIp } from './interfaces/HostList.interface';
 import SSH2Promise from 'ssh2-promise';
 import wait from 'wait';
 import TFTP from 'tftp';
@@ -16,8 +16,8 @@ import { DateTime } from 'luxon';
 
 @Injectable()
 export class NodesService {
-  private states = new Map<AnsibleHost, NodeState>();
-  private bootTargets = new Map<AnsibleHost, OS>();
+  private states = new Map<HostIp, NodeState>();
+  private bootTargets = new Map<HostIp, OS>();
   private logger = new Logger(NodesService.name);
   readonly waitShutdownPeriods = 60;
   readonly waitBootPeriods = 30;
@@ -46,34 +46,32 @@ export class NodesService {
     tftp.listen();
   }
 
-  private initStates() {
+  private async initStates() {
     this.states.clear();
     const p = this.configService.createInventoryPath();
-    const inventory = readFileSync(p, { encoding: 'utf-8' });
-    const parsed = yaml.parse(inventory) as Inventory;
+    const hostList = readFileSync(p, { encoding: 'utf-8' });
+    const parsed = yaml.parse(hostList) as HostList;
 
-    Object.entries(parsed.kubernetes.children.worker.hosts || {}).forEach(
-      ([fqdn, host]) => {
-        const state: NodeState = {
-          timestamp: new Date().getTime(),
+    Object.entries(parsed.hosts || {}).forEach(([fqdn, host]) => {
+      const state: NodeState = {
+        timestamp: new Date().getTime(),
 
-          mac: host.mac_address,
-          host: host.ansible_host,
-          fqdn,
-          name: host.name,
+        mac: host.mac_address,
+        host: host.ip,
+        fqdn,
+        name: host.name,
 
-          alive: false,
-          os: OS.WINDOWS,
-          loadAvg: '0.00 0.00 0.00',
-          actionPending: false,
+        alive: false,
+        os: OS.WINDOWS,
+        loadAvg: '0.00 0.00 0.00',
+        actionPending: false,
 
-          username: host.username,
-          usernameWindows: host.username_windows,
-        };
-        this.setState(state);
-        this.bootTargets.set(state.host, OS.WINDOWS);
-      },
-    );
+        usernameLinux: host.username_linux,
+        usernameWindows: host.username_windows,
+      };
+      this.setState(state);
+      this.bootTargets.set(state.host, OS.WINDOWS);
+    });
   }
 
   public getState(host: string) {
@@ -93,26 +91,28 @@ export class NodesService {
     const newState = { ...state };
     newState.timestamp = new Date().getTime();
     // Check every user starting with ubuntu
-    for (const username of [state.username, state.usernameWindows]) {
-      const ssh = this.getSSHConnection(state, username);
-      try {
-        newState.alive = true;
-        // If this command works then it's ubuntu
-        const loadAvg: string = await ssh.exec('cat', ['/proc/loadavg']);
-        newState.loadAvg = loadAvg.substr(0, 14);
-        newState.os = OS.UBUNTU;
-        await ssh.close();
-        break;
-      } catch (e) {
-        // If fails with ssh error (level in object) then it's dead
-        if ('level' in e) {
-          newState.alive = false;
-          // Check next username
-        }
-        // If fails with other error (/proc/loadavg not found) then it's windows
-        else {
-          newState.os = OS.WINDOWS;
+    for (const username of [state.usernameLinux, state.usernameWindows]) {
+      if (username) {
+        const ssh = this.getSSHConnection(state, username);
+        try {
+          newState.alive = true;
+          // If this command works then it's ubuntu
+          const loadAvg: string = await ssh.exec('cat', ['/proc/loadavg']);
+          newState.loadAvg = loadAvg.substr(0, 14);
+          newState.os = OS.UBUNTU;
+          await ssh.close();
           break;
+        } catch (e) {
+          // If fails with ssh error (level in object) then it's dead
+          if ('level' in e) {
+            newState.alive = false;
+            // Check next username
+          }
+          // If fails with other error (/proc/loadavg not found) then it's windows
+          else {
+            newState.os = OS.WINDOWS;
+            break;
+          }
         }
       }
     }
@@ -230,7 +230,7 @@ export class NodesService {
   }
 
   private getUsername(state: NodeState) {
-    return state.os === OS.UBUNTU ? state.username : state.usernameWindows;
+    return state.os === OS.UBUNTU ? state.usernameLinux : state.usernameWindows;
   }
 
   private getSSHConnection(state: NodeState, username?: string) {

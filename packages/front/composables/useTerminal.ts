@@ -7,7 +7,8 @@ export function useTerminal() {
   const router = useRouter()
 
   function getSshCommand(state: NodeState) {
-    const username = state.os === OS.UBUNTU ? state.username : state.usernameWindows
+    const username =
+      state.os === OS.UBUNTU ? state.usernameLinux : state.usernameWindows
 
     if (username)
       return `clear; ssh ${username}@${state.host}`

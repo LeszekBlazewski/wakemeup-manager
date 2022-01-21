@@ -2,7 +2,7 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - 229 Cluster Manager',
+    titleTemplate: '%s - Wake me up Manager',
     htmlAttrs: {
       lang: 'en'
     },
@@ -47,19 +47,19 @@ export default {
   ],
 
   axios: {
-    baseURL: `${process.env.BASE_URL || 'http://localhost'}/api/`,
+    baseURL: `${process.env.BASE_URL || 'http://localhost:3000'}/api/`,
   },
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: `${process.env.BASE_URL || 'http://localhost'}/api/`
+      baseURL: `${process.env.BASE_URL || 'http://localhost:3000'}/api/`
     },
     io: {  // will be available in this.$config.io (client-side)
       sockets: [
         {
           default: true,
           name: 'socket',
-          url: `${process.env.BASE_URL || 'http://localhost'}/`
+          url: `${process.env.BASE_URL || 'http://localhost:3000'}/`
         }
       ]
     }
@@ -70,7 +70,7 @@ export default {
         {
           default: true,
           name: 'socket',
-          url: `${process.env.BASE_URL || 'http://localhost'}/`
+          url: `${process.env.BASE_URL || 'http://localhost:3000'}/`
         }
       ]
     }

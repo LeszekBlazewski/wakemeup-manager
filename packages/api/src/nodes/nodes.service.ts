@@ -46,7 +46,7 @@ export class NodesService {
     tftp.listen();
   }
 
-  private async initStates() {
+  private initStates() {
     this.states.clear();
     const p = this.configService.createInventoryPath();
     const hostList = readFileSync(p, { encoding: 'utf-8' });

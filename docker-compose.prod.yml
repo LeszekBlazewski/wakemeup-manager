@@ -18,3 +18,11 @@ services:
     ports:
       - 443:443
       - 80:80
+  api:
+    image: lblazewski/wakemeupmanager
+
+  wol-agent:
+    image: lblazewski/wakemeupmanager
+
+  front:
+    image: lblazewski/wakemeupmanager

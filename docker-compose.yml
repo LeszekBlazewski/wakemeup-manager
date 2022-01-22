@@ -67,7 +67,7 @@ services:
       - 3002
 
   wetty:
-    image: wettyoss/wetty
+    image: lblazewski/wetty:2.1.2
     command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER}
       --ssh-host ${SSH_HOST} --ssh-key
       ${SSH_PRIVATE_KEY:-/app/config/ssh_key} --ssh-auth publickey,password"

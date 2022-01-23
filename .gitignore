@@ -7,3 +7,4 @@ config/ssh_key
 config/id_ed25519
 
 *.log
+.DS_Store

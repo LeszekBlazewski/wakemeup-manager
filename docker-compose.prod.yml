@@ -18,6 +18,7 @@ services:
       - STAGING=false
     volumes:
       - ./config/default-ssl.conf:/config/nginx/site-confs/default
+      - certificates-data:/config/etc/letsencrypt
     ports:
       - 443:443
       - 80:80
@@ -85,3 +86,6 @@ services:
       - ./config:/app/config:ro
     expose:
       - 3001
+
+volumes:
+  certificates-data:

@@ -66,7 +66,7 @@
           <v-icon> mdi-console-line </v-icon>
         </v-btn>
         <v-btn
-          v-if="state.alive && state.os === OS.UBUNTU"
+          v-if="state.alive"
           title="Generate boot token"
           fab
           small
@@ -161,5 +161,4 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -4,6 +4,9 @@ version: "3.9"
 services:
   proxy:
     image: linuxserver/swag:1.22.0
+    depends_on:
+      - api
+      - front
     cap_add:
       - NET_ADMIN
     environment:
@@ -20,9 +23,65 @@ services:
       - 80:80
   api:
     image: lblazewski/wakemeupmanager
+    command: npx lerna run --scope api --stream start:prod
+    restart: unless-stopped
+    depends_on:
+      - wol-agent
+      - wetty
+    extra_hosts:
+      - "wol-agent:172.17.0.1"
+    ports:
+      - 6969:6969/udp
+    expose:
+      - 3000
+    environment:
+      - AUTH_USERNAME=${AUTH_USERNAME:-master}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-password}
+      - HOSTS_LIST=${HOSTS_LIST:-/app/config/hosts.yml}
+      - STUDENT_USERNAME=${STUDENT_USERNAME:-student}
+      - SECRET=${SECRET:-secret}
+      - EXPIRES_IN=${EXPIRES_IN:-1h}
+      - SECRET_REFRESH=${SECRET_REFRESH:-secretRefresh}
+      - REFRESH_EXPIRES_IN=${REFRESH_EXPIRES_IN:-1d}
+      - REFRESH_REMEMBER_EXPIRES_IN=${REFRESH_REMEMBER_EXPIRES_IN:-7d}
+      - BOOT_TOKEN_SECRET=${BOOT_TOKEN_SECRET:-bootSecret}
+      - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY:-/app/config/ssh_key}
+      - STATE_CHECK_INTERVAL=${STATE_CHECK_INTERVAL:-10}
+      - TFTP_PORT=${TFTP_PORT:-6969}
+      - GRUB_UBUNTU=${GRUB_UBUNTU:-0}
+      - WOL_AGENT_URL=http://wol-agent:3003
+      - WOL_AGENT_SECRET=${SECRET:-wolSecret}
+      - GRUB_WINDOWS=${GRUB_WINDOWS:-3}
+      - WETTY_TARGET_URL=http://wetty:3001
+      - WETTY_PROXY_URL=/api/wetty
+      - LOG_VERBOSITY=${LOG_VERBOSITY:-4}
+    volumes:
+      - ./config:/app/config:ro
 
   wol-agent:
     image: lblazewski/wakemeupmanager
+    command: npx lerna run --scope wol-agent --stream start:prod
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - SECRET=${SECRET:-wolSecret}
 
   front:
     image: lblazewski/wakemeupmanager
+    command: npx lerna run --scope front --stream start
+    restart: unless-stopped
+    environment:
+      - BASE_URL=${BASE_URL:-http://localhost}
+    expose:
+      - 3002
+
+  wetty:
+    image: lblazewski/wetty:2.1.2
+    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER}
+      --ssh-host ${SSH_HOST} --ssh-key
+      ${SSH_PRIVATE_KEY:-/app/config/ssh_key} --ssh-auth publickey,password"
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config:ro
+    expose:
+      - 3001

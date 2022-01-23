@@ -89,7 +89,7 @@ The whole stack requires some configuration, so read the below instructions care
 ### Hosts that will be waken up and connected to
 
 1. Ensure that your machine supports wake on lan, is in the same network/subnet as the host running the application and is connected via ethernet cable.
-1. Enable Wake on Lan in BIOS and on all of the systems (if you run dualboot, make sure to enable it both on Linux and Windows for example).
+1. Enable Wake on Lan in BIOS and on all of the systems (if you run dualboot, make sure to enable it both on Linux and Windows for example). Here are instructions for [ubuntu](./wol/ubuntu/README.md) and [windows](./wol/windows/README.md).
 1. Enable the SSHD daemon (Yeah Windows has this built in, just enable it) and add the created public key to authorized_keys, so you can connect from the host running the app.
 1. Allow the user accounts that are used during SSH connection to shut down the machines without password for sudo. This is needed because the app simply connects to given host and issues `sudo shutdown now` when shutdown is requested from the panel. In Linux for user `lab` this can be done simply with:
 

@@ -90,12 +90,18 @@ The whole stack requires some configuration, so read the below instructions care
 
 1. Ensure that your machine supports wake on lan, is in the same network/subnet as the host running the application and is connected via ethernet cable.
 1. Enable Wake on Lan in BIOS and on all of the systems (if you run dualboot, make sure to enable it both on Linux and Windows for example). Here are instructions for [ubuntu](./wol/ubuntu/README.md) and [windows](./wol/windows/README.md).
-1. Enable the SSHD daemon (Yeah Windows has this built in, just enable it) and add the created public key to authorized_keys, so you can connect from the host running the app.
+1. Enable the SSHD daemon (Yeah Windows has this built in, just enable it) and add the created public key to authorized_keys, there are some instructions in [windows](./wol/windows/README.md). We make this so your main host can connect to other nodes. If you need the generate token feature, also enable SSH password auth for given machines. Later, from the dashboard you will be able to generate the token and set the password for the account. Password auth for SSH can be enabled with:
+
+```bash
+sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
+sudo systemctl restart ssh
+```
+
 1. Allow the user accounts that are used during SSH connection to shut down the machines without password for sudo. This is needed because the app simply connects to given host and issues `sudo shutdown now` when shutdown is requested from the panel. In Linux for user `lab` this can be done simply with:
 
 ```bash
-echo 'lab ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown' > /target/etc/sudoers.d/labnopass
-chmod 440 /target/etc/sudoers.d/labnopass
+echo 'lab ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown' | sudo tee -a /etc/sudoers.d/labnopass
+chmod 440 /etc/sudoers.d/labnopass
 ```
 
 The name `lab` corresponds to the equivalent `username_linux` from hosts.yml file created in the next sections. If you also will generate tokens, for student accounts, make sure to add `/sbin/chpasswd` at the end so the app can modify the password.

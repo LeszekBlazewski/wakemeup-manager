@@ -98,6 +98,8 @@ echo 'lab ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown' > /t
 chmod 440 /target/etc/sudoers.d/labnopass
 ```
 
+The name `lab` corresponds to the equivalent `username_linux` from hosts.yml file created in the next sections. If you also will generate tokens, for student accounts, make sure to add `/sbin/chpasswd` at the end so the app can modify the password.
+
 4. **If you need the choose system to boot functionality**
 
 This step is optional because it's not needed for the app to work properly. If you run only one system on the given machine, you can **safely skip this step**. If you need it, you need to ensure that the following requirements are met:

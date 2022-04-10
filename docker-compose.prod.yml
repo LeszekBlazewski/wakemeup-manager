@@ -4,6 +4,7 @@ version: "3.9"
 services:
   proxy:
     image: linuxserver/swag:1.22.0
+    restart: unless-stopped
     depends_on:
       - api
       - front

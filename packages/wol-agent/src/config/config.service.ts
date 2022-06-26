@@ -13,4 +13,10 @@ export class ConfigService implements JwtOptionsFactory {
       secret: process.env.SECRET || 'wolSecret',
     };
   }
+  public get wolConfig() {
+    return {
+      address: process.env.WOL_ADDRESS || '255.255.255.255',
+      port: +process.env.port || 9,
+    }
+  };
 }

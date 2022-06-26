@@ -30,7 +30,7 @@ export class AppController {
       const errors = await validate(payload);
       if (errors.length) throw new BadRequestException(errors);
 
-      wol.wake(payload.mac);
+      wol.wake(payload.mac, this.configService.wolConfig);
       this.logger.log(`Waking ${payload.mac}`);
     } catch (e) {
       if (e instanceof JsonWebTokenError) {

@@ -56,6 +56,8 @@ services:
     network_mode: host
     environment:
       - SECRET=${SECRET:-wolSecret}
+      - WOL_ADDRESS=${WOL_ADDRESS:-255.255.255.255}
+      - WOL_PORT=${WOL_PORT:-9}
 
   front:
     build: .
@@ -68,9 +70,7 @@ services:
 
   wetty:
     image: lblazewski/wetty:2.1.2
-    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER}
-      --ssh-host ${SSH_HOST} --ssh-key
-      ${SSH_PRIVATE_KEY:-/app/config/ssh_key} --ssh-auth publickey,password"
+    command: "wetty -p 3001 -b /api/wetty/ --allow-iframe --ssh-user ${SSH_USER} --ssh-host ${SSH_HOST} --ssh-key ${SSH_PRIVATE_KEY:-/app/config/ssh_key} --ssh-auth publickey,password"
     restart: unless-stopped
     volumes:
       - ./config:/app/config:ro

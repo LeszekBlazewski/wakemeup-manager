@@ -11,7 +11,7 @@ export function useTerminal() {
       state.os === OS.UBUNTU ? state.usernameLinux : state.usernameWindows
 
     if (username)
-      return `clear; ssh ${username}@${state.host}`
+      return `clear; ssh -p ${process.env.NODE_SSH_PORT || 22} ${username}@${state.host}`;
     else {
       const err = `No username found for OS: ${state.os}`
       show(err)

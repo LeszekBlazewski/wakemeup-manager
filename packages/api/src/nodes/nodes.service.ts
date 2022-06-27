@@ -9,6 +9,7 @@ import wait from 'wait';
 import TFTP from 'tftp';
 import { HttpService } from '@nestjs/axios';
 import { BootOptions } from 'src/config/interfaces/boot-options.interface';
+import { WaitForStatusOptions } from 'src/config/interfaces/wait-for-status-options.interface';
 import { JwtService } from '@nestjs/jwt';
 import { firstValueFrom } from 'rxjs';
 import { BootTokenCreateDto } from './dto/boot-token-create.dto';
@@ -19,8 +20,7 @@ export class NodesService {
   private states = new Map<HostIp, NodeState>();
   private bootTargets = new Map<HostIp, OS>();
   private logger = new Logger(NodesService.name);
-  readonly waitShutdownPeriods = 60;
-  readonly waitBootPeriods = 30;
+  readonly waitForStatusOptions: WaitForStatusOptions;
   readonly bootOptions: BootOptions;
   readonly studentUsername: string;
 
@@ -31,6 +31,7 @@ export class NodesService {
   ) {
     this.initStates();
     this.bootOptions = configService.createBootOptions();
+    this.waitForStatusOptions = configService.createWaitForStatusOptions();
     this.studentUsername = configService.createStudentOptions().username;
 
     const tftp = TFTP.createServer(
@@ -136,7 +137,7 @@ export class NodesService {
       await ssh.close();
 
       /** Wait for shutdown */
-      let waitPeriods = this.waitShutdownPeriods;
+      let waitPeriods = this.waitForStatusOptions.waitShutdownPeriods;
       do {
         await wait(1000);
         afterState = await this.checkState(state);
@@ -162,7 +163,7 @@ export class NodesService {
 
     /** Wait for boot */
     let afterState: NodeState;
-    let waitPeriods = this.waitBootPeriods;
+    let waitPeriods = this.waitForStatusOptions.waitBootPeriods;
     do {
       await this.wake(state.mac);
       await wait(1000);
@@ -236,8 +237,9 @@ export class NodesService {
   private getSSHConnection(state: NodeState, username?: string) {
     return new SSH2Promise({
       host: state.host,
+      port: this.configService.createSSHOptions().sshPort,
       username: username || this.getUsername(state),
-      identity: this.configService.createPrivateKeyPath(),
+      identity: this.configService.createSSHOptions().sshPrivateKeyPath,
       readyTimeout: 1000,
       reconnect: false,
       reconnectDelay: 0,

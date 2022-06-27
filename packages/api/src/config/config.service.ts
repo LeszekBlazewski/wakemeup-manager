@@ -3,6 +3,8 @@ import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
 import { resolve } from 'path';
 import { OS } from 'src/types';
 import { BootOptions } from './interfaces/boot-options.interface';
+import { WaitForStatusOptions } from './interfaces/wait-for-status-options.interface';
+
 @Injectable()
 export class ConfigService implements JwtOptionsFactory {
   public createUserData() {
@@ -48,11 +50,11 @@ export class ConfigService implements JwtOptionsFactory {
     };
   }
 
-  public createPrivateKeyPath() {
-    return (
-      process.env.SSH_PRIVATE_KEY ||
-      resolve(__dirname, '../../../../config/id_ed25519')
-    );
+  public createSSHOptions() {
+    return {
+      sshPrivateKeyPath: process.env.SSH_PRIVATE_KEY || resolve(__dirname, '../../../../config/id_ed25519'),
+      sshPort: +process.env.NODE_SSH_PORT || 22
+    }
   }
 
   public createTftpOptions() {
@@ -82,5 +84,12 @@ export class ConfigService implements JwtOptionsFactory {
       proxy: process.env.WETTY_PROXY_URL || '/api/wetty',
       target: process.env.WETTY_TARGET_URL || 'http://localhost:3001',
     };
+  }
+
+  public createWaitForStatusOptions(): WaitForStatusOptions {
+    return {
+      waitShutdownPeriods: +process.env.WAIT_SHUTDOWN_SECONDS || 60,
+      waitBootPeriods: +process.env.WAIT_BOOT_SECONDS || 30,
+    }
   }
 }

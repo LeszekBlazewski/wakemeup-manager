@@ -133,8 +133,8 @@ If all of the above is met proceed with:
 **Keep the existing entries and add the below ones**
 
 ```sh
-set_timeout_style=hidden # optional if you want GRUB to not show up
-set_timeout=0            # optional if you want GRUB to not show up
+set timeout_style=hidden # optional if you want GRUB to not show up
+set timeout=0            # optional if you want GRUB to not show up
 
 insmod net
 insmod efinet

@@ -52,7 +52,7 @@ export class ConfigService implements JwtOptionsFactory {
 
   public createSSHOptions() {
     return {
-      sshPrivateKeyPath: process.env.SSH_PRIVATE_KEY || resolve(__dirname, '../../../../config/id_ed25519'),
+      sshPrivateKeyPath: process.env.NODE_SSH_PRIVATE_KEY || resolve(__dirname, '../../../../config/id_ed25519'),
       sshPort: +process.env.NODE_SSH_PORT || 22
     }
   }
